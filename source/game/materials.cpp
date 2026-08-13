@@ -262,8 +262,9 @@ void Materials::createOtherTileset() {
 		tilesets["NPCs"] = npc_tileset;
 	}
 
-	// There should really be an iterator to do this
-	for (ServerItemId id : g_item_definitions.allIds()) {
+	const uint32_t max_item_id = g_item_definitions.maxServerId();
+	for (uint32_t raw_id = 0; raw_id <= max_item_id; ++raw_id) {
+		const ServerItemId id = static_cast<ServerItemId>(raw_id);
 		const auto definition = g_item_definitions.get(id);
 		if (!definition) {
 			continue;
