@@ -49,6 +49,7 @@ bool ItemDefinitionResolver::resolve(const ItemDefinitionLoadInput& input, const
 		case ItemDefinitionMode::DatOnly:
 			return resolveDatOnly(input, fragments, rows, error, warnings, missingReport);
 		case ItemDefinitionMode::DatSrv:
+		case ItemDefinitionMode::ProtobufOtb:
 		case ItemDefinitionMode::Protobuf:
 			error = "Selected item definition mode is not implemented yet.";
 			return false;
