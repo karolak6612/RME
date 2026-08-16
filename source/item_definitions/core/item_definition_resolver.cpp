@@ -50,7 +50,7 @@ bool ItemDefinitionResolver::resolve(const ItemDefinitionLoadInput& input, const
 			return resolveDatOnly(input, fragments, rows, error, warnings, missingReport);
 		case ItemDefinitionMode::DatSrv:
 		case ItemDefinitionMode::ProtobufOtb:
-		case ItemDefinitionMode::Protobuf:
+		case ItemDefinitionMode::ProtobufOnly:
 			error = "Selected item definition mode is not implemented yet.";
 			return false;
 	}

@@ -264,7 +264,7 @@ public:
 	ClientVersionList getExtensionsSupported() const;
 
 	bool isProtobuf() const {
-        return item_definition_mode == ItemDefinitionMode::Protobuf || item_definition_mode == ItemDefinitionMode::ProtobufOtb;
+        return item_definition_mode == ItemDefinitionMode::ProtobufOnly || item_definition_mode == ItemDefinitionMode::ProtobufOtb;
 	}
 
 	void markDirty() {

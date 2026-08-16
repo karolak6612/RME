@@ -83,7 +83,7 @@ enum class ItemDefinitionMode : uint8_t {
 	DatOnly,
 	DatSrv,
 	ProtobufOtb,
-	Protobuf
+	ProtobufOnly
 };
 
 inline std::string toString(ItemDefinitionMode mode) {
@@ -96,8 +96,8 @@ inline std::string toString(ItemDefinitionMode mode) {
 			return "dat_srv";
 		case ItemDefinitionMode::ProtobufOtb:
 			return "protobuf_otb";
-		case ItemDefinitionMode::Protobuf:
-			return "protobuf";
+		case ItemDefinitionMode::ProtobufOnly:
+			return "protobuf_only";
 	}
 	return "dat_otb";
 }
@@ -119,8 +119,8 @@ inline std::optional<ItemDefinitionMode> parseItemDefinitionMode(std::string val
 	if (value == "protobuf_otb") {
 		return ItemDefinitionMode::ProtobufOtb;
 	}
-	if (value == "protobuf") {
-		return ItemDefinitionMode::Protobuf;
+	if (value == "protobuf_only") {
+		return ItemDefinitionMode::ProtobufOnly;
 	}
 	return std::nullopt;
 }
