@@ -35,6 +35,7 @@ struct RenderView {
 	glm::mat4 viewMatrix;
 
 	void Setup(MapCanvas* canvas, const DrawingOptions& options);
+	[[nodiscard]] ViewBounds getBoundsForFloor(int map_z, int extra_margin_tiles = 0) const;
 	void SetupGL();
 	void ReleaseGL();
 	void Clear();

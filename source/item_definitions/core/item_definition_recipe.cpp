@@ -23,13 +23,13 @@ const ItemDefinitionRecipe& ItemDefinitionRecipeRegistry::get(ItemDefinitionMode
 		.mode = ItemDefinitionMode::ProtobufOtb,
 		.sources = { ItemDefinitionSourceKind::Protobuf, ItemDefinitionSourceKind::Otb, ItemDefinitionSourceKind::Xml },
 		.source_count = 3,
-		.runnable = false,
+		.runnable = true,
 	};
 	static const ItemDefinitionRecipe protobuf_only {
 		.mode = ItemDefinitionMode::ProtobufOnly,
 		.sources = { ItemDefinitionSourceKind::Protobuf, ItemDefinitionSourceKind::Xml, ItemDefinitionSourceKind::Xml },
 		.source_count = 2,
-		.runnable = false,
+		.runnable = true,
 	};
 
 	switch (mode) {

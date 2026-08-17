@@ -6,10 +6,47 @@
 #include <ranges>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
 
 namespace {
 	constexpr uint64_t flagMask(ItemFlag flag) {
 		return uint64_t { 1 } << static_cast<uint8_t>(flag);
+	}
+
+	constexpr bool isTooltipType(ItemTypes_t type) {
+		switch (type) {
+			case ITEM_TYPE_DEPOT:
+			case ITEM_TYPE_MAILBOX:
+			case ITEM_TYPE_TRASHHOLDER:
+			case ITEM_TYPE_CONTAINER:
+			case ITEM_TYPE_DOOR:
+			case ITEM_TYPE_TELEPORT:
+				return true;
+			default:
+				return false;
+		}
+	}
+
+	constexpr bool isMetaItemOrLiquid(ServerItemId server_id, const XmlItemFragment& xml) {
+		return !xml.client_id.has_value() && server_id > 0 && server_id < 100;
+	}
+
+	void finalizeDerivedProperties(ResolvedItemDefinitionRow& row) {
+		if (row.type == ITEM_TYPE_NONE && row.volume > 0) {
+			row.type = ITEM_TYPE_CONTAINER;
+		}
+
+		if (row.type == ITEM_TYPE_CONTAINER && row.group == ITEM_GROUP_NONE) {
+			row.group = ITEM_GROUP_CONTAINER;
+		}
+
+		if (row.type == ITEM_TYPE_MAGICFIELD && row.group == ITEM_GROUP_NONE) {
+			row.group = ITEM_GROUP_MAGICFIELD;
+		}
+
+		if (isTooltipType(row.type)) {
+			row.flags |= flagMask(ItemFlag::Tooltipable);
+		}
 	}
 
 	// Check if a DAT item is empty/invalid and should be skipped
@@ -44,13 +81,18 @@ namespace {
 bool ItemDefinitionResolver::resolve(const ItemDefinitionLoadInput& input, const ItemDefinitionFragments& fragments, std::vector<ResolvedItemDefinitionRow>& rows, wxString& error, std::vector<std::string>& warnings, MissingItemReport* missingReport) {
 	rows.clear();
 	switch (input.mode) {
+		// modes with otb
 		case ItemDefinitionMode::DatOtb:
-			return resolveDatOtb(input, fragments, rows, error, warnings, missingReport);
-		case ItemDefinitionMode::DatOnly:
-			return resolveDatOnly(input, fragments, rows, error, warnings, missingReport);
-		case ItemDefinitionMode::DatSrv:
 		case ItemDefinitionMode::ProtobufOtb:
+			return resolveDatOtb(input, fragments, rows, error, warnings, missingReport);
+
+		// modes without otb
+		case ItemDefinitionMode::DatOnly:
 		case ItemDefinitionMode::ProtobufOnly:
+			return resolveDatOnly(input, fragments, rows, error, warnings, missingReport);
+
+		// items.srv
+		case ItemDefinitionMode::DatSrv:
 			error = "Selected item definition mode is not implemented yet.";
 			return false;
 	}
@@ -124,6 +166,7 @@ bool ItemDefinitionResolver::resolveDatOtb(const ItemDefinitionLoadInput& input,
 		if (xml_it != fragments.xml.end()) {
 			applyXmlOverrides(xml_it->second, row);
 		}
+		finalizeDerivedProperties(row);
 
 		rows.push_back(std::move(row));
 	}
@@ -223,6 +266,13 @@ bool ItemDefinitionResolver::resolveDatOnly(const ItemDefinitionLoadInput& input
 		row.flags = dat.flags;
 		row.way_speed = dat.way_speed;
 		row.always_on_top_order = dat.always_on_top_order;
+		if (dat.max_text_len.has_value()) {
+			row.max_text_len = *dat.max_text_len;
+		}
+		if (dat.slot_position.has_value()) {
+			row.slot_position = *dat.slot_position;
+		}
+		row.passive_metadata_json = dat.passive_metadata_json;
 		rows.push_back(std::move(row));
 		client_to_row[client_id] = rows.size() - 1;
 	}
@@ -230,7 +280,7 @@ bool ItemDefinitionResolver::resolveDatOnly(const ItemDefinitionLoadInput& input
 	// 2. Apply items.xml overrides
 	for (const auto& [server_id, xml] : fragments.xml) {
 		// Skip server-side fluid types and special items (IDs < 100)
-		if (server_id < 100) {
+		if (isMetaItemOrLiquid(server_id, xml)) {
 			continue;
 		}
 
@@ -248,7 +298,7 @@ bool ItemDefinitionResolver::resolveDatOnly(const ItemDefinitionLoadInput& input
 					.description = xml.description
 				});
 			} else {
-				warnings.push_back(std::format("Skipping items.xml entry {} in dat_only mode because DAT client id {} is missing.", server_id, client_id));
+				warnings.push_back(std::format("Skipping items.xml entry {} in dat/protobuf only mode because DAT client id {} is missing.", server_id, client_id));
 			}
 			continue;
 		}
@@ -256,7 +306,7 @@ bool ItemDefinitionResolver::resolveDatOnly(const ItemDefinitionLoadInput& input
 		// DAT item exists. Handle duplicate XML mappings.
 		const auto owner_it = xml_server_by_client.find(client_id);
 		if (owner_it != xml_server_by_client.end() && owner_it->second != server_id) {
-			warnings.push_back(std::format("Duplicate items.xml client id {} in dat_only mode for server ids {} and {}. Keeping the first mapping.", client_id, owner_it->second, server_id));
+			warnings.push_back(std::format("Duplicate items.xml client id {} in dat/protobuf only mode for server ids {} and {}. Keeping the first mapping.", client_id, owner_it->second, server_id));
 			continue;
 		}
 		if (owner_it == xml_server_by_client.end()) {
@@ -267,6 +317,10 @@ bool ItemDefinitionResolver::resolveDatOnly(const ItemDefinitionLoadInput& input
 		ResolvedItemDefinitionRow& row = rows[row_it->second];
 		row.server_id = server_id;
 		applyXmlOverrides(xml, row);
+	}
+
+	for (auto& row : rows) {
+		finalizeDerivedProperties(row);
 	}
 
 	// 3. Report items in tibia.dat that are missing from items.xml
@@ -287,9 +341,10 @@ bool ItemDefinitionResolver::resolveDatOnly(const ItemDefinitionLoadInput& input
 	}
 
 	if (rows.empty()) {
-		error = "No item definitions were resolved from DAT/XML.";
+		error = "No item definitions were resolved from DAT/protobuf/XML.";
 		return false;
 	}
+
 	return true;
 }
 
