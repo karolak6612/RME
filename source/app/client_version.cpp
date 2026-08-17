@@ -504,7 +504,7 @@ bool ClientVersion::hasValidPaths() {
 	}
 
 	// protobuf does not use signatures
-	if (protobuf || !g_settings.getInteger(Config::CHECK_SIGNATURES)) {
+	if (isProtobuf() || !g_settings.getInteger(Config::CHECK_SIGNATURES)) {
 		return true;
 	}
 

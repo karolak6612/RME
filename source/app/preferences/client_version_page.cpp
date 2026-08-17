@@ -55,7 +55,9 @@ std::string ConfigTypeFromSelection(long selection) {
 		case 2:
 			return "dat_srv";
 		case 3:
-			return "protobuf";
+			return "protobuf_otb";
+		case 4:
+			return "protobuf_only";
 		default:
 			return "dat_otb";
 	}
@@ -68,8 +70,11 @@ int SelectionFromConfigType(const std::string& value) {
 	if (value == "dat_srv") {
 		return 2;
 	}
-	if (value == "protobuf") {
+	if (value == "protobuf_otb") {
 		return 3;
+	}
+	if (value == "protobuf_only") {
+        return 4;
 	}
 	return 0;
 }
@@ -456,7 +461,8 @@ void ClientVersionPage::RefreshClientEditor() {
 	config_choices.Add("dat_otb");
 	config_choices.Add("dat_only");
 	config_choices.Add("dat_srv");
-	config_choices.Add("protobuf");
+	config_choices.Add("protobuf_otb");
+	config_choices.Add("protobuf_only");
 	auto* config_property = client_prop_grid->Append(new wxEnumProperty("Configuration Type", "configType", config_choices, SelectionFromConfigType(active_client->getConfigType())));
 	config_property->SetHelpString("How item definitions are loaded for this client.");
 
