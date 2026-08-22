@@ -44,22 +44,35 @@ namespace {
 	};
 
 	ResolvedClientFile resolveClientFile(const wxFileName& client_path, const std::string& configured_name, const std::string& fallback_name) {
-		const auto sanitizeFileName = [](const std::string& raw_name) {
-			return wxFileName(wxString::FromUTF8(raw_name)).GetFullName().ToStdString();
+		const auto isSafeRelativePath = [](const std::string& raw_name) {
+			if (raw_name.empty()) {
+				return false;
+			}
+			const wxFileName path(wxString::FromUTF8(raw_name));
+			if (path.IsAbsolute()) {
+				return false;
+			}
+			for (const auto& directory : path.GetDirs()) {
+				if (directory == "..") {
+					return false;
+				}
+			}
+			return true;
 		};
 
-		ResolvedClientFile resolved;
-		resolved.filename = sanitizeFileName(configured_name);
-		resolved.path = wxFileName(client_path.GetFullPath(), wxString::FromUTF8(resolved.filename));
-		if (resolved.path.FileExists()) {
-			resolved.exists = true;
-			return resolved;
+		for (const auto& candidate_name : { configured_name, fallback_name }) {
+			if (!isSafeRelativePath(candidate_name)) {
+				continue;
+			}
+			ResolvedClientFile resolved;
+			resolved.filename = candidate_name;
+			resolved.path = wxFileName(client_path.GetFullPath(), wxString::FromUTF8(candidate_name));
+			resolved.exists = resolved.path.FileExists();
+			if (resolved.exists) {
+				return resolved;
+			}
 		}
-
-		resolved.filename = sanitizeFileName(fallback_name);
-		resolved.path = wxFileName(client_path.GetFullPath(), wxString::FromUTF8(resolved.filename));
-		resolved.exists = resolved.path.FileExists();
-		return resolved;
+		return {};
 	}
 
 	std::optional<uint32_t> readSignature(const wxFileName& path, std::string_view label, std::vector<std::string>& warnings) {

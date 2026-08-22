@@ -108,7 +108,7 @@ void SpritePreloader::preload(GameSprite* spr, int pattern_x, int pattern_y, int
 				if (img && !img->isGLLoaded) {
 					// Ensure parent is set so GC can invalidate cached_default_region
 					// when evicting this sprite later (prevents stale cache -> wrong sprite)
-					img->parent = spr;
+					img->addParent(spr);
 					ids_to_enqueue.push_back({ { archive.get(), img->id }, img->generation_id });
 				}
 			}
@@ -143,22 +143,17 @@ void SpritePreloader::workerLoop(std::stop_token stop_token) {
 		Task task;
 		{
 			std::unique_lock<std::mutex> lock(queue_mutex);
-			cv.wait(lock, [this, &stop_token] { return stop_token.stop_requested() || !task_queue.empty(); });
+			cv.wait(lock, [this, &stop_token] {
+				return stop_token.stop_requested() || (!task_queue.empty()
+					&& result_queue.size() < MAX_RESULT_QUEUE_SIZE
+					&& queued_result_bytes < MAX_RESULT_QUEUE_BYTES);
+			});
 			if (stop_token.stop_requested()) {
 				break;
 			}
 			task = std::move(task_queue.front());
 			task_queue.pop();
 		}
-
-		{
-			std::lock_guard<std::mutex> lock(queue_mutex);
-			if (result_queue.size() >= MAX_RESULT_QUEUE_SIZE || queued_result_bytes >= MAX_RESULT_QUEUE_BYTES) {
-				pending_ids.erase(task.pending);
-				continue;
-			}
-		}
-
 		std::unique_ptr<uint8_t[]> rgba;
 		ImageDimensions dimensions;
 		if (!task.archive || !task.archive->readRGBA(task.pending.key.id, task.has_transparency, rgba, dimensions)) {
@@ -239,8 +234,10 @@ void SpritePreloader::update() {
 					if (img->pixel_width != res.dimensions.width || img->pixel_height != res.dimensions.height) {
 						img->pixel_width = res.dimensions.width;
 						img->pixel_height = res.dimensions.height;
-						if (img->parent) {
-							img->parent->invalidateMetricCaches();
+						for (GameSprite* parent : img->parents) {
+							if (parent) {
+								parent->invalidateMetricCaches();
+							}
 						}
 					}
 					img->fulfillPreload(std::move(res.data));
@@ -255,6 +252,7 @@ void SpritePreloader::update() {
 			pending_ids.erase(pending);
 		}
 	}
+	cv.notify_all();
 }
 
 namespace rme {

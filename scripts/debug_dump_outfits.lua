@@ -11,7 +11,7 @@ local function dumpOutfits(options)
     local offsetX = options.offsetX or 10
     local offsetY = options.offsetY or 10
     local offsetZ = options.offsetZ or 0
-    local itemsPerRow = options.itemsPerRow or 60
+    local itemsPerRow = options.itemsPerRow or 15
 
     if offsetX < 0 or offsetY < 0 or offsetZ < 0 or offsetZ > 15 then
         app.alert("invalid offset values")
@@ -45,7 +45,7 @@ local function dumpOutfits(options)
             inserted = inserted + 1
 
             x = x + 4
-            if x >= offsetX + itemsPerRow then
+            if x >= offsetX + itemsPerRow * 4 then
                 x = offsetX
                 y = y + 4
             end
@@ -59,7 +59,7 @@ dumpOutfits({
     offsetX = 10,
     offsetY = 10,
     offsetZ = 0,
-    itemsPerRow = 60,
+    itemsPerRow = 15,
     maxZ = 15
 })
 app.setCameraPosition(10, 10, 0)

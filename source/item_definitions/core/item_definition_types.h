@@ -116,7 +116,7 @@ inline std::optional<ItemDefinitionMode> parseItemDefinitionMode(std::string val
 	if (value == "dat_srv") {
 		return ItemDefinitionMode::DatSrv;
 	}
-	if (value == "protobuf_otb") {
+	if (value == "protobuf" || value == "protobuf_otb") {
 		return ItemDefinitionMode::ProtobufOtb;
 	}
 	if (value == "protobuf_only") {

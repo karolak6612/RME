@@ -3,6 +3,8 @@
 
 #include "rendering/core/image.h"
 
+#include <vector>
+
 class GameSprite;
 
 class NormalImage : public Image {
@@ -35,8 +37,10 @@ public:
 	}
 
 	void fulfillPreload(std::unique_ptr<uint8_t[]> preloaded_data);
+	void addParent(GameSprite* sprite);
 
 	GameSprite* parent = nullptr;
+	std::vector<GameSprite*> parents;
 };
 
 #endif

@@ -70,7 +70,7 @@ int SelectionFromConfigType(const std::string& value) {
 	if (value == "dat_srv") {
 		return 2;
 	}
-	if (value == "protobuf_otb") {
+	if (value == "protobuf" || value == "protobuf_otb") {
 		return 3;
 	}
 	if (value == "protobuf_only") {

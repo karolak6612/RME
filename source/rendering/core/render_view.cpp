@@ -52,6 +52,7 @@ ViewBounds RenderView::getBoundsForFloor(int map_z, int extra_margin_tiles) cons
 	int start = view_scroll_x / TILE_SIZE;
 	int top = view_scroll_y / TILE_SIZE;
 
+	// The underground shift follows the camera floor, while expansion follows map_z.
 	if (floor > GROUND_LAYER) {
 		start -= 2;
 		top -= 2;

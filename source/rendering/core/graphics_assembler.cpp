@@ -113,7 +113,7 @@ bool GraphicsAssembler::installSpriteEntry(GraphicManager& manager, const DatCat
 			warnings.push_back(std::format("GraphicsAssembler: sprite {} references out-of-range image {}.", entry.client_id, sprite_id));
 			return false;
 		}
-		image->parent = sprite_ptr;
+		image->addParent(sprite_ptr);
 		sprite_ptr->spriteList.push_back(image);
 	}
 	sprite_ptr->updateSimpleStatus();
@@ -148,7 +148,7 @@ bool GraphicsAssembler::install(GraphicManager& manager, const DatCatalog& catal
 		return false;
 	}
 
-	const auto sprite_space_size = static_cast<size_t>(catalog.lastEntryId()) + 1;
+	const auto sprite_space_size = std::max<size_t>(1, catalog.entries.size());
 	const auto image_space_size = imageSpaceSize(catalog);
 
 	resetRuntimeState(manager);

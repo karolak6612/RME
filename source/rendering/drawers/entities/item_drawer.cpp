@@ -174,7 +174,7 @@ void ItemDrawer::BlitItem(SpriteBatch& sprite_batch, SpriteDrawer* sprite_drawer
 	int pattern_y = patterns.y;
 	int pattern_z = patterns.z;
 	int frame = patterns.frame;
-	const auto& composite_metrics = spr->getPlainLayoutMetrics(subtype, pattern_x, pattern_y, pattern_z, frame);
+		const auto composite_metrics = spr->getPlainLayoutMetrics(subtype, pattern_x, pattern_y, pattern_z, frame);
 
 	if (light_buffer && view && item->hasLight()) {
 		registerSpriteLight(*light_buffer, *view, screenx, screeny, composite_metrics, item->getLight());

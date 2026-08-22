@@ -123,13 +123,13 @@ namespace LuaAPI {
 				if (lookType < 0) {
 					throw sol::error("setPodiumOutfit: lookType must not be negative");
 				}
+				if (direction && (*direction < 0 || *direction > 255)) {
+					throw sol::error("setPodiumOutfit: direction must be between 0 and 255");
+				}
 				Outfit outfit = podium->getOutfit();
 				outfit.lookType = lookType;
 				podium->setOutfit(outfit);
 				if (direction) {
-					if (*direction < 0 || *direction > 255) {
-						throw sol::error("setPodiumOutfit: direction must be between 0 and 255");
-					}
 					podium->setDirection(static_cast<uint8_t>(*direction));
 				}
 			},

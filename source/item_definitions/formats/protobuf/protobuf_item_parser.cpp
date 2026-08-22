@@ -331,7 +331,11 @@ void ProtobufItemParser::appendFragments(const DatCatalog& catalog, ItemDefiniti
 bool ProtobufItemParser::parse(const ItemDefinitionLoadInput& input, ItemDefinitionFragments& fragments, wxString& error, std::vector<std::string>& warnings) const {
 	if (input.dat_catalog != nullptr) {
 		appendFragments(*input.dat_catalog, fragments);
-		return !fragments.dat.empty();
+		if (fragments.dat.empty()) {
+			error = "No item definitions were available in the DAT catalog.";
+			return false;
+		}
+		return true;
 	}
 
 	DatCatalog catalog;
@@ -379,6 +383,10 @@ bool ProtobufItemParser::parseCatalog(const ItemDefinitionLoadInput& input, DatC
 		error = "The protobuf appearances file does not contain a valid item id range.";
 		return false;
 	}
+	if (item_count > std::numeric_limits<uint16_t>::max() || creature_count > std::numeric_limits<uint16_t>::max()) {
+		error = "The protobuf appearances file contains ids outside the supported catalog range.";
+		return false;
+	}
 
 	catalog = {};
 	catalog.format = DAT_FORMAT_1057;
@@ -399,6 +407,7 @@ bool ProtobufItemParser::parseCatalog(const ItemDefinitionLoadInput& input, DatC
 
 		auto& entry = catalog.entries[object.id()];
 		if (!fillEntry(object, object.id(), entry, catalog, true)) {
+			entry = {};
 			warnings.push_back(std::format("Skipping protobuf object appearance {} because it has no sprite data.", object.id()));
 		}
 	}
@@ -412,6 +421,7 @@ bool ProtobufItemParser::parseCatalog(const ItemDefinitionLoadInput& input, DatC
 		const uint32_t client_id = item_count + outfit.id();
 		auto& entry = catalog.entries[client_id];
 		if (!fillEntry(outfit, client_id, entry, catalog, false)) {
+			entry = {};
 			warnings.push_back(std::format("Skipping protobuf outfit appearance {} because it has no sprite data.", outfit.id()));
 		}
 	}

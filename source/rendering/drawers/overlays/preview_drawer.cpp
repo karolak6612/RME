@@ -75,7 +75,7 @@ void PreviewDrawer::draw(SpriteBatch& sprite_batch, MapCanvas* canvas, const Ren
 					}
 					if (options.show_special_tiles && tile->getMapFlags() & TILESTATE_PVPZONE) {
 						r = r / 3 * 2;
-						b = r / 3 * 2;
+						b = b / 3 * 2;
 					}
 					if (options.show_special_tiles && tile->getMapFlags() & TILESTATE_NOLOGOUT) {
 						b /= 2;

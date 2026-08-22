@@ -162,6 +162,7 @@ bool ItemDefinitionResolver::resolveDatOtb(const ItemDefinitionLoadInput& input,
 		// We add it to the rows so the editor recognizes the ID.
 		dat_ids_referenced_by_otb.insert(effective_client_id);
 		row.flags |= dat_it->second.flags & ~flagMask(ItemFlag::Moveable);
+		row.passive_metadata_json = dat_it->second.passive_metadata_json;
 
 		if (xml_it != fragments.xml.end()) {
 			applyXmlOverrides(xml_it->second, row);

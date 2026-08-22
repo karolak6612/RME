@@ -64,8 +64,10 @@ public:
 	bool initialize(int initial_layers = 8);
 
 	/**
-	 * Add a 32x32 sprite to the atlas.
-	 * @param rgba_data Pointer to 32*32*4 bytes of RGBA pixel data
+	 * Add a sprite to the atlas.
+	 * @param rgba_data Pointer to pixel_width*pixel_height*4 bytes of RGBA pixel data
+	 * @param pixel_width Sprite width in pixels
+	 * @param pixel_height Sprite height in pixels
 	 * @return AtlasRegion with layer and UV coordinates, or nullopt on failure
 	 */
 	std::optional<AtlasRegion> addSprite(const uint8_t* rgba_data, int pixel_width, int pixel_height);

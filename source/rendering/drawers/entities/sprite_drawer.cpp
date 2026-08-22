@@ -82,13 +82,13 @@ void SpriteDrawer::BlitSprite(SpriteBatch& sprite_batch, int screenx, int screen
 	screenx -= draw_offset.first;
 	screeny -= draw_offset.second;
 
-	int tme = 0; // GetTime() % itype->FPA;
+	const int tme = spr->animator ? spr->animator->getFrame() : 0;
 
 	// Atlas-only rendering - ensure atlas is available
 	// Note: ensureAtlasManager is called by MapDrawer at frame start usually, but we check here too if needed?
 	// BatchRenderer::SetAtlasManager call removed. Use sprite_batch.
 
-	const auto& layout_metrics = spr->getPlainLayoutMetrics(-1, 0, 0, 0, tme);
+	const auto layout_metrics = spr->getPlainLayoutMetrics(-1, 0, 0, 0, tme);
 	int x_offset = 0;
 	for (int cx = 0; cx != spr->width; ++cx) {
 		int y_offset = 0;

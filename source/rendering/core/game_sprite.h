@@ -102,8 +102,8 @@ public:
 	int getDrawHeight() const;
 	std::pair<int, int> getDrawOffset() const;
 	uint8_t getMiniMapColor() const;
-	const SpriteLayoutMetrics& getPlainLayoutMetrics(int subtype, int pattern_x, int pattern_y, int pattern_z, int frame);
-	const SpriteLayoutMetrics& getOutfitLayoutMetrics(int dir, int addon, int pattern_z, int frame);
+	SpriteLayoutMetrics getPlainLayoutMetrics(int subtype, int pattern_x, int pattern_y, int pattern_z, int frame);
+	SpriteLayoutMetrics getOutfitLayoutMetrics(int dir, int addon, int pattern_z, int frame);
 	void invalidateMetricCaches();
 
 	bool hasLight() const noexcept {

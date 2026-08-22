@@ -30,18 +30,18 @@ namespace {
 			return 0;
 		}
 
-		uint32_t index = 0;
+		size_t index = 0;
 		if (subtype >= 0 && sprite.height <= 1 && sprite.width <= 1) {
-			index = static_cast<uint32_t>(subtype);
+			index = static_cast<size_t>(subtype);
 		} else {
-			index = static_cast<uint32_t>((((((frame) * sprite.pattern_y + pattern_y) * sprite.pattern_x + pattern_x) * sprite.layers + layer) * sprite.height + y) * sprite.width + x);
+			index = sprite.getIndex(x, y, layer, pattern_x, pattern_y, pattern_z, frame);
 		}
 
 		if (index >= sprite.numsprites) {
 			index = sprite.numsprites == 1 ? 0 : index % sprite.numsprites;
 		}
 
-		return static_cast<size_t>(index);
+		return index;
 	}
 
 	size_t resolveOutfitSpriteIndex(const GameSprite& sprite, int x, int y, int dir, int addon, int pattern_z, int frame) {
@@ -57,10 +57,14 @@ namespace {
 	}
 
 	void finalizeLayoutMetrics(GameSprite::SpriteLayoutMetrics& metrics) {
-		metrics.total_width = std::accumulate(metrics.column_widths.begin(), metrics.column_widths.end(), 0);
-		metrics.total_height = std::accumulate(metrics.row_heights.begin(), metrics.row_heights.end(), 0);
-		metrics.left_offset = metrics.column_widths.empty() ? 0 : metrics.total_width - metrics.column_widths.back();
-		metrics.top_offset = metrics.row_heights.empty() ? 0 : metrics.total_height - metrics.row_heights.back();
+		if (!metrics.column_widths.empty()) {
+			metrics.total_width = std::accumulate(metrics.column_widths.begin(), metrics.column_widths.end(), 0);
+			metrics.left_offset = metrics.total_width - metrics.column_widths.back();
+		}
+		if (!metrics.row_heights.empty()) {
+			metrics.total_height = std::accumulate(metrics.row_heights.begin(), metrics.row_heights.end(), 0);
+			metrics.top_offset = metrics.total_height - metrics.row_heights.back();
+		}
 	}
 }
 
@@ -266,7 +270,7 @@ uint8_t GameSprite::getMiniMapColor() const {
 	return minimap_color;
 }
 
-const GameSprite::SpriteLayoutMetrics& GameSprite::getPlainLayoutMetrics(int subtype, int pattern_x, int pattern_y, int pattern_z, int frame) {
+GameSprite::SpriteLayoutMetrics GameSprite::getPlainLayoutMetrics(int subtype, int pattern_x, int pattern_y, int pattern_z, int frame) {
 	const PlainLayoutCacheKey key {
 		.subtype = subtype,
 		.pattern_x = pattern_x,
@@ -322,7 +326,7 @@ GameSprite::SpriteLayoutMetrics GameSprite::buildPlainLayoutMetrics(const PlainL
 	return metrics;
 }
 
-const GameSprite::SpriteLayoutMetrics& GameSprite::getOutfitLayoutMetrics(int dir, int addon, int pattern_z, int frame) {
+GameSprite::SpriteLayoutMetrics GameSprite::getOutfitLayoutMetrics(int dir, int addon, int pattern_z, int frame) {
 	const OutfitLayoutCacheKey key {
 		.dir = dir,
 		.addon = addon,

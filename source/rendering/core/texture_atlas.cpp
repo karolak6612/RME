@@ -148,13 +148,7 @@ bool TextureAtlas::normalizePixelDimension(int& pixel_width, int& pixel_height) 
 	}
 
 	auto normalize = [](int value) {
-		if (value <= BASE_SLOT_SIZE) {
-			return BASE_SLOT_SIZE;
-		}
-		if (value <= MAX_SPRITE_SIZE) {
-			return MAX_SPRITE_SIZE;
-		}
-		return 0;
+		return value <= MAX_SPRITE_SIZE && value % BASE_SLOT_SIZE == 0 ? value : 0;
 	};
 
 	pixel_width = normalize(pixel_width);
@@ -244,8 +238,10 @@ std::optional<AtlasRegion> TextureAtlas::addSprite(const uint8_t* rgba_data, int
 		return std::nullopt;
 	}
 
+	const int requested_width = pixel_width;
+	const int requested_height = pixel_height;
 	if (!normalizePixelDimension(pixel_width, pixel_height)) {
-		spdlog::error("TextureAtlas::addSprite called with unsupported sprite size {}x{}", pixel_width, pixel_height);
+		spdlog::error("TextureAtlas::addSprite called with unsupported sprite size {}x{}", requested_width, requested_height);
 		return std::nullopt;
 	}
 
@@ -311,6 +307,12 @@ void TextureAtlas::freeSlot(const AtlasRegion& region) {
 	const int layer = static_cast<int>(region.atlas_index);
 	const int slot_width = std::max(1, region.slot_width);
 	const int slot_height = std::max(1, region.slot_height);
+	if (layer < 0 || layer >= layer_count_ || region.pixel_x < 0 || region.pixel_y < 0
+		|| slot_x < 0 || slot_y < 0 || slot_x >= SLOTS_PER_ROW || slot_y >= SLOTS_PER_ROW
+		|| slot_width > SLOTS_PER_ROW - slot_x || slot_height > SLOTS_PER_ROW - slot_y) {
+		spdlog::warn("TextureAtlas: freeSlot called with out-of-range region [x={}, y={}, layer={}] - ignoring", slot_x, slot_y, layer);
+		return;
+	}
 
 	for (int y = 0; y < slot_height; ++y) {
 		for (int x = 0; x < slot_width; ++x) {
@@ -322,6 +324,9 @@ void TextureAtlas::freeSlot(const AtlasRegion& region) {
 	}
 
 	setAreaOccupied(layer, slot_x, slot_y, slot_width, slot_height, false);
+	const size_t freed_index = occupancyIndex(layer, slot_x, slot_y);
+	small_search_hint_ = std::min(small_search_hint_, freed_index);
+	large_search_hint_ = std::min(large_search_hint_, freed_index);
 	for (int y = 0; y < slot_height; ++y) {
 		for (int x = 0; x < slot_width; ++x) {
 			free_slots_.push_back(FreeSlot {

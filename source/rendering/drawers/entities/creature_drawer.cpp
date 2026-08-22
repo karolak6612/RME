@@ -142,7 +142,7 @@ void CreatureDrawer::BlitCreature(SpriteBatch& sprite_batch, SpriteDrawer* sprit
 				mountOutfit.lookLegs = outfit.lookMountLegs;
 				mountOutfit.lookFeet = outfit.lookMountFeet;
 				const auto mount_draw_offset = mountSpr->getDrawOffset();
-				const auto& mount_metrics = mountSpr->getOutfitLayoutMetrics(static_cast<int>(dir), 0, 0, resolvedFrame);
+				const auto mount_metrics = mountSpr->getOutfitLayoutMetrics(static_cast<int>(dir), 0, 0, resolvedFrame);
 
 				if (options.light_buffer && options.view && mountSpr->hasLight()) {
 					registerCreatureSpriteLight(*options.light_buffer, *options.view, screenx, screeny, mount_draw_offset, mount_metrics, mountSpr->getLight(), false);
@@ -185,7 +185,7 @@ void CreatureDrawer::BlitCreature(SpriteBatch& sprite_batch, SpriteDrawer* sprit
 					}
 				}
 
-				const auto& sprite_metrics = spr->getOutfitLayoutMetrics(static_cast<int>(dir), pattern_y, pattern_z, resolvedFrame);
+				const auto sprite_metrics = spr->getOutfitLayoutMetrics(static_cast<int>(dir), pattern_y, pattern_z, resolvedFrame);
 
 				int sprite_x_offset = 0;
 				for (int cx = 0; cx != spr->width; ++cx) {

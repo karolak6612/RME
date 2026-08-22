@@ -9,6 +9,8 @@
 #include <format>
 #include <fstream>
 #include <limits>
+#include <algorithm>
+#include <cstring>
 #include <spdlog/spdlog.h>
 #include <array>
 #include <span>
@@ -332,14 +334,14 @@ bool SpriteArchive::loadSheetPixels(const ProtobufSheet& sheet) const {
 
 	const lzma_ret ret = lzma_code(&stream, LZMA_RUN);
 	lzma_end(&stream);
-	if (ret != LZMA_STREAM_END) {
+	if (ret != LZMA_STREAM_END || stream.total_out < static_cast<uint64_t>(kBmpHeaderPadding) + kSheetBytes) {
 		spdlog::error("SpriteArchive: failed to decode protobuf sprite sheet {} (lzma ret={})", sheet.path, static_cast<int>(ret));
 		return false;
 	}
 
 	uint32_t pixel_offset = 0;
 	std::memcpy(&pixel_offset, decompressed.get() + 10, sizeof(uint32_t));
-	if (pixel_offset >= kSheetBytes + kBmpHeaderPadding) {
+	if (pixel_offset > static_cast<uint32_t>(kBmpHeaderPadding)) {
 		spdlog::error("SpriteArchive: protobuf sprite sheet {} has an invalid BMP pixel offset", sheet.path);
 		return false;
 	}
@@ -421,6 +423,13 @@ bool SpriteArchive::readProtobufRgba(uint32_t sprite_id, std::unique_ptr<uint8_t
 	const uint32_t sprite_offset = sprite_id - sheet.first_id;
 	const int columns = kSheetDimension / source_width;
 	const int sprite_row = static_cast<int>(sprite_offset / static_cast<uint32_t>(columns));
+	const int rows = kSheetDimension / source_height;
+	if (sprite_row >= rows) {
+		spdlog::error("SpriteArchive: sprite {} is outside the bounds of sheet {}", sprite_id, sheet.path);
+		target.reset();
+		dimensions = {};
+		return false;
+	}
 
 	const int sprite_column = static_cast<int>(sprite_offset % static_cast<uint32_t>(columns));
 	const auto* pixels = sheet.decoded_pixels->data();

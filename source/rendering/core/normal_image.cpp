@@ -22,8 +22,10 @@ namespace {
 
 		image.pixel_width = dimensions.width;
 		image.pixel_height = dimensions.height;
-		if (image.parent) {
-			image.parent->invalidateMetricCaches();
+		for (GameSprite* parent : image.parents) {
+			if (parent) {
+				parent->invalidateMetricCaches();
+			}
 		}
 	}
 }
@@ -44,6 +46,18 @@ NormalImage::~NormalImage() {
 	}
 }
 
+void NormalImage::addParent(GameSprite* sprite) {
+	if (!sprite) {
+		return;
+	}
+	if (!parent) {
+		parent = sprite;
+	}
+	if (std::find(parents.begin(), parents.end(), sprite) == parents.end()) {
+		parents.push_back(sprite);
+	}
+}
+
 void NormalImage::fulfillPreload(std::unique_ptr<uint8_t[]> data) {
 	atlas_region = EnsureAtlasSprite(id, std::move(data), getDimensions());
 }
@@ -57,8 +71,10 @@ void NormalImage::clean(time_t time, int longevity) {
 		if (g_gui.gfx.hasAtlasManager()) {
 			g_gui.gfx.getAtlasManager()->removeSprite(id);
 		}
-		if (parent) {
-			parent->invalidateCache(atlas_region);
+		for (GameSprite* sprite : parents) {
+			if (sprite) {
+				sprite->invalidateCache(atlas_region);
+			}
 		}
 
 		isGLLoaded = false;

@@ -15,7 +15,8 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, bool
 
 	const int bgshade = g_settings.getInteger(Config::ICON_BACKGROUND);
 
-	int image_size = std::max(sprite->GetSize().x, sprite->GetSize().y);
+	const auto layout_metrics = sprite->getPlainLayoutMetrics(-1, 0, 0, 0, 0);
+	int image_size = std::max(layout_metrics.total_width, layout_metrics.total_height);
 	wxImage image(image_size, image_size);
 	image.Create(image_size, image_size);
 	image.InitAlpha();
@@ -46,7 +47,15 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, bool
 					const auto dimensions = sprite->spriteList[i]->getDimensions();
 					wxImage img(dimensions.width, dimensions.height, data.get(), true);
 					img.SetMaskColour(0xFF, 0x00, 0xFF);
-					image.Paste(img, (sprite->width - w - 1) * SPRITE_PIXELS, (sprite->height - h - 1) * SPRITE_PIXELS);
+					int x_offset = 0;
+					for (int column = w + 1; column < sprite->width; ++column) {
+						x_offset += layout_metrics.column_widths[column];
+					}
+					int y_offset = 0;
+					for (int row = h + 1; row < sprite->height; ++row) {
+						y_offset += layout_metrics.row_heights[row];
+					}
+					image.Paste(img, x_offset, y_offset);
 				}
 			}
 		}
@@ -71,7 +80,8 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, cons
 
 	const int bgshade = g_settings.getInteger(Config::ICON_BACKGROUND);
 
-	int image_size = std::max(sprite->GetSize().x, sprite->GetSize().y);
+	const auto layout_metrics = sprite->getOutfitLayoutMetrics(static_cast<int>(direction), 0, 0, 0);
+	int image_size = std::max(layout_metrics.total_width, layout_metrics.total_height);
 	wxImage image(image_size, image_size);
 	image.Create(image_size, image_size);
 	image.InitAlpha();
@@ -144,8 +154,17 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, cons
 							wxImage img(dimensions.width, dimensions.height, data.get(), true);
 							img.SetMaskColour(0xFF, 0x00, 0xFF);
 							// Mount offset
-							int mount_x = (sprite->width - w - 1) * SPRITE_PIXELS - mountSpr->getDrawOffset().first;
-							int mount_y = (sprite->height - h - 1) * SPRITE_PIXELS - mountSpr->getDrawOffset().second;
+							const auto mount_metrics = mountSpr->getOutfitLayoutMetrics(static_cast<int>(direction), 0, 0, mount_frame_index);
+							int mount_x = 0;
+							for (int column = w + 1; column < mountSpr->width; ++column) {
+								mount_x += mount_metrics.column_widths[column];
+							}
+							int mount_y = 0;
+							for (int row = h + 1; row < mountSpr->height; ++row) {
+								mount_y += mount_metrics.row_heights[row];
+							}
+							mount_x -= mountSpr->getDrawOffset().first;
+							mount_y -= mountSpr->getDrawOffset().second;
 							image.Paste(img, mount_x, mount_y);
 						}
 					}
@@ -199,7 +218,16 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, cons
 					if (data) {
 						wxImage img(dimensions.width, dimensions.height, data.get(), true);
 						img.SetMaskColour(0xFF, 0x00, 0xFF);
-						image.Paste(img, (sprite->width - w - 1) * SPRITE_PIXELS, (sprite->height - h - 1) * SPRITE_PIXELS);
+						const auto pattern_metrics = sprite->getOutfitLayoutMetrics(static_cast<int>(direction), pattern_y, pattern_z, 0);
+						int x_offset = 0;
+						for (int column = w + 1; column < sprite->width; ++column) {
+							x_offset += pattern_metrics.column_widths[column];
+						}
+						int y_offset = 0;
+						for (int row = h + 1; row < sprite->height; ++row) {
+							y_offset += pattern_metrics.row_heights[row];
+						}
+						image.Paste(img, x_offset, y_offset);
 					}
 				}
 			}
