@@ -319,6 +319,9 @@ int ClientVersionPage::GetMajorGroup(const ClientVersion& version) const {
 }
 
 void ClientVersionPage::PopulateClientTree() {
+	const bool previous_ignore_tree_selection = ignore_tree_selection;
+	ignore_tree_selection = true;
+
 	ClientVersion* preferred_selection = active_client;
 	client_tree_ctrl->DeleteAllItems();
 	auto root = client_tree_ctrl->AddRoot("Clients");
@@ -368,7 +371,6 @@ void ClientVersionPage::PopulateClientTree() {
 		client_tree_ctrl->Expand(group_to_expand);
 	}
 
-	ignore_tree_selection = true;
 	if (item_to_select.IsOk()) {
 		client_tree_ctrl->SelectItem(item_to_select);
 		client_tree_ctrl->EnsureVisible(item_to_select);
@@ -378,7 +380,7 @@ void ClientVersionPage::PopulateClientTree() {
 	} else {
 		client_tree_ctrl->UnselectAll();
 	}
-	ignore_tree_selection = false;
+	ignore_tree_selection = previous_ignore_tree_selection;
 }
 
 void ClientVersionPage::SelectClient(ClientVersion* version) {
@@ -785,8 +787,13 @@ void ClientVersionPage::UpdatePropertyValidation(wxPGProperty* prop) {
 	}
 }
 
-void ClientVersionPage::OnClientSelected(wxTreeEvent& WXUNUSED(event)) {
+void ClientVersionPage::OnClientSelected(wxTreeEvent& event) {
 	if (ignore_tree_selection) {
+		return;
+	}
+
+	// Ignore selection events queued for items removed during a tree rebuild.
+	if (!event.GetItem().IsOk() || event.GetItem() != client_tree_ctrl->GetSelection()) {
 		return;
 	}
 
@@ -805,7 +812,7 @@ void ClientVersionPage::OnClientSelected(wxTreeEvent& WXUNUSED(event)) {
 		return;
 	}
 
-	if (had_dirty_changes) {
+	if (had_dirty_changes && !previous_client->isDirty()) {
 		PopulateDefaultVersionChoice();
 		PopulateClientTree();
 		ignore_tree_selection = true;
