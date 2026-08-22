@@ -80,8 +80,41 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, cons
 
 	const int bgshade = g_settings.getInteger(Config::ICON_BACKGROUND);
 
-	const auto layout_metrics = sprite->getOutfitLayoutMetrics(static_cast<int>(direction), 0, 0, 0);
-	int image_size = std::max(layout_metrics.total_width, layout_metrics.total_height);
+	int frame_index = 0;
+	if (sprite->pattern_x == 4) {
+		frame_index = direction;
+	}
+
+	int pattern_z = 0;
+	GameSprite* mountSpr = outfit.lookMount != 0 ? g_gui.gfx.getCreatureSprite(outfit.lookMount) : nullptr;
+	if (mountSpr) {
+		pattern_z = std::min<int>(1, sprite->pattern_z - 1);
+	}
+
+	int min_x = 0;
+	int min_y = 0;
+	int max_x = 0;
+	int max_y = 0;
+	const auto includeMetrics = [&](const GameSprite::SpriteLayoutMetrics& metrics, int offset_x = 0, int offset_y = 0) {
+		min_x = std::min(min_x, offset_x);
+		min_y = std::min(min_y, offset_y);
+		max_x = std::max(max_x, offset_x + metrics.total_width);
+		max_y = std::max(max_y, offset_y + metrics.total_height);
+	};
+
+	for (int selected_pattern = 0; selected_pattern < sprite->pattern_y; ++selected_pattern) {
+		if (selected_pattern > 0 && (selected_pattern - 1 >= 31 || !(outfit.lookAddon & (1 << (selected_pattern - 1))))) {
+			continue;
+		}
+		includeMetrics(sprite->getOutfitLayoutMetrics(static_cast<int>(direction), selected_pattern, pattern_z, frame_index));
+	}
+	if (mountSpr) {
+		const auto mount_metrics = mountSpr->getOutfitLayoutMetrics(static_cast<int>(direction), 0, 0, mountSpr->pattern_x == 4 ? direction : 0);
+		includeMetrics(mount_metrics, -mountSpr->getDrawOffset().first, -mountSpr->getDrawOffset().second);
+	}
+	const int image_width = max_x - min_x;
+	const int image_height = max_y - min_y;
+	const int image_size = std::max(image_width, image_height);
 	wxImage image(image_size, image_size);
 	image.Create(image_size, image_size);
 	image.InitAlpha();
@@ -103,15 +136,8 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, cons
 	}
 	std::ranges::fill(alphaData, 255);
 
-	int frame_index = 0;
-	if (sprite->pattern_x == 4) {
-		frame_index = direction;
-	}
-
 	// Mounts
-	int pattern_z = 0;
-	if (outfit.lookMount != 0) {
-		if (GameSprite* mountSpr = g_gui.gfx.getCreatureSprite(outfit.lookMount)) {
+	if (mountSpr) {
 			// Mount outfit
 			Outfit mountOutfit;
 			mountOutfit.lookType = outfit.lookMount;
@@ -165,13 +191,13 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, cons
 							}
 							mount_x -= mountSpr->getDrawOffset().first;
 							mount_y -= mountSpr->getDrawOffset().second;
+							mount_x -= min_x;
+							mount_y -= min_y;
 							image.Paste(img, mount_x, mount_y);
 						}
 					}
 				}
 			}
-			pattern_z = std::min<int>(1, sprite->pattern_z - 1);
-		}
 	}
 
 	for (int pattern_y = 0; pattern_y < sprite->pattern_y; pattern_y++) {
@@ -227,7 +253,7 @@ wxBitmap SpriteIconGenerator::Generate(GameSprite* sprite, SpriteSize size, cons
 						for (int row = h + 1; row < sprite->height; ++row) {
 							y_offset += pattern_metrics.row_heights[row];
 						}
-						image.Paste(img, x_offset, y_offset);
+						image.Paste(img, x_offset - min_x, y_offset - min_y);
 					}
 				}
 			}

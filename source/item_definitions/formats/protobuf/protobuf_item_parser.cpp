@@ -2,6 +2,7 @@
 
 #include "appearances.pb.h"
 #include "app/client_version.h"
+#include "app/definitions.h"
 #include "util/json.h"
 
 #include <fstream>
@@ -426,6 +427,13 @@ bool ProtobufItemParser::parseCatalog(const ItemDefinitionLoadInput& input, DatC
 		}
 	}
 
+	if (catalog.max_sprite_id >= MAX_SPRITES) {
+		error = wxString::FromUTF8(std::format(
+			"Protobuf catalog references sprite id {} which exceeds MAX_SPRITES={}.",
+			catalog.max_sprite_id,
+			MAX_SPRITES));
+		return false;
+	}
 	catalog.sprite_dimensions.assign(static_cast<size_t>(catalog.max_sprite_id) + 1, DatSpriteDimensions {});
 	return true;
 }
