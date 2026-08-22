@@ -27,6 +27,7 @@
 #include "map/tile.h"
 #include "editor/selection.h"
 #include "game/items.h"
+#include "game/complexitem.h"
 #include "brushes/raw/raw_brush.h"
 #include "brushes/ground/auto_border.h"
 #include "util/file_system.h"
@@ -621,6 +622,9 @@ namespace LuaAPI {
 
 		app["setCameraPosition"] = [](int x, int y, int z) {
 			g_gui.SetScreenCenterPosition(Position(x, y, z));
+		};
+		app["getCreatureSpriteMaxId"] = []() -> int {
+			return static_cast<int>(g_gui.gfx.getCreatureSpriteMaxID());
 		};
 		app["storage"] = storageForScript;
 
