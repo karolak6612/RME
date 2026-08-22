@@ -14,10 +14,12 @@ local function dumpItems(options)
     local itemsPerRow = options.itemsPerRow or 60
 
     if offsetX < 0 or offsetY < 0 or offsetZ < 0 or offsetZ > 15 then
-        error("dumpItems: invalid offset values")
+        app.alert("invalid offset values")
+		return
     end
     if itemsPerRow <= 0 or itemsPerRow > 10000 then
-        error("dumpItems: itemsPerRow must be between 1 and 10000")
+        app.alert("itemsPerRow must be between 1 and 10000")
+		return
     end
 
     local inserted = 0

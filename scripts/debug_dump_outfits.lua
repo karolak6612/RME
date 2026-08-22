@@ -14,10 +14,12 @@ local function dumpOutfits(options)
     local itemsPerRow = options.itemsPerRow or 60
 
     if offsetX < 0 or offsetY < 0 or offsetZ < 0 or offsetZ > 15 then
-        error("dumpOutfits: invalid offset values")
+        app.alert("invalid offset values")
+		return
     end
     if itemsPerRow <= 0 or itemsPerRow > 10000 then
-        error("dumpOutfits: itemsPerRow must be between 1 and 10000")
+        app.alert("itemsPerRow must be between 1 and 10000")
+		return
     end
 
     local podiumId
@@ -29,7 +31,8 @@ local function dumpOutfits(options)
         end
     end
     if not podiumId then
-        error("dumpOutfits: no podium item definition found")
+        app.alert("no podium item definition found")
+		return
     end
 
     local inserted = 0
