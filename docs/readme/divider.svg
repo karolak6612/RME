@@ -1,0 +1,68 @@
+<svg width="1200" height="34" viewBox="0 0 1200 34" xmlns="http://www.w3.org/2000/svg" role="presentation">
+<defs>
+  <linearGradient id="iron" x1="0" x2="1"><stop offset="0%" stop-color="#2A2E33"/><stop offset="50%" stop-color="#3A424A"/><stop offset="100%" stop-color="#2A2E33"/></linearGradient>
+  <radialGradient id="gem" cx="50%" cy="38%" r="58%"><stop offset="0%" stop-color="#FFF2A8"/><stop offset="35%" stop-color="#FFB62E"/><stop offset="70%" stop-color="#FF6B2B"/><stop offset="100%" stop-color="#7A1F0A"/></radialGradient>
+  <radialGradient id="torchGlow2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FF8A2B" stop-opacity="0.5"/><stop offset="100%" stop-color="#FF6B2B" stop-opacity="0"/></radialGradient>
+  <linearGradient id="chainGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3A424A"/><stop offset="100%" stop-color="#1A1E22"/></linearGradient>
+</defs>
+<!-- iron bar -->
+<rect y="15" width="1200" height="4" rx="2" fill="url(#iron)" stroke="#0E1012" stroke-width="1"/>
+<rect y="15" width="1200" height="1.2" fill="#4A535E" opacity="0.6"/>
+<!-- left chain links -->
+<g opacity="0.9">
+  <g transform="translate(160,17)">
+    <ellipse cx="0" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+    <ellipse cx="16" cy="0" rx="10" ry="6" fill="none" stroke="#2F353B" stroke-width="2"/>
+    <ellipse cx="32" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+  </g>
+  <g transform="translate(980,17) scale(-1,1)">
+    <ellipse cx="0" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+    <ellipse cx="16" cy="0" rx="10" ry="6" fill="none" stroke="#2F353B" stroke-width="2"/>
+    <ellipse cx="32" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+  </g>
+</g>
+<!-- animated lantern lights -->
+<g>
+  <!-- light 1 left -->
+  <g transform="translate(300,17)">
+    <ellipse cx="0" cy="0" rx="11" ry="11" fill="url(#torchGlow2)" opacity="0.45"><animate attributeName="opacity" values="0.45;0.18;0.45" dur="0.9s" repeatCount="indefinite"/></ellipse>
+    <circle r="3.2" fill="url(#gem)" stroke="#1A0A06" stroke-width="0.9"><animate attributeName="opacity" values="1;0.62;1" dur="0.7s" repeatCount="indefinite"/></circle>
+    <circle r="1.25" fill="#FFF7C6" opacity="0.95"/>
+    <circle r="3.2" fill="none" stroke="#FF8A2B" stroke-width="0.9" opacity="0.28"><animate attributeName="r" values="3.2;7;3.2" dur="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.28;0;0.28" dur="1.6s" repeatCount="indefinite"/></circle>
+  </g>
+  <!-- light 2 left-mid -->
+  <g transform="translate(430,17)">
+    <ellipse cx="0" cy="0" rx="9" ry="9" fill="url(#torchGlow2)" opacity="0.38"><animate attributeName="opacity" values="0.38;0.15;0.38" dur="1.05s" repeatCount="indefinite" begin="0.2s"/></ellipse>
+    <circle r="2.6" fill="url(#gem)" stroke="#1A0A06" stroke-width="0.8"><animate attributeName="opacity" values="1;0.68;1" dur="0.82s" repeatCount="indefinite" begin="0.15s"/></circle>
+    <circle r="1" fill="#FFF7C6" opacity="0.92"/>
+  </g>
+  <!-- light 3 right-mid -->
+  <g transform="translate(770,17)">
+    <ellipse cx="0" cy="0" rx="9" ry="9" fill="url(#torchGlow2)" opacity="0.38"><animate attributeName="opacity" values="0.38;0.16;0.38" dur="1s" repeatCount="indefinite" begin="0.35s"/></ellipse>
+    <circle r="2.6" fill="url(#gem)" stroke="#1A0A06" stroke-width="0.8"><animate attributeName="opacity" values="1;0.7;1" dur="0.78s" repeatCount="indefinite" begin="0.3s"/></circle>
+    <circle r="1" fill="#FFF7C6" opacity="0.92"/>
+  </g>
+  <!-- light 4 right -->
+  <g transform="translate(900,17)">
+    <ellipse cx="0" cy="0" rx="11" ry="11" fill="url(#torchGlow2)" opacity="0.45"><animate attributeName="opacity" values="0.45;0.2;0.45" dur="0.88s" repeatCount="indefinite" begin="0.4s"/></ellipse>
+    <circle r="3.2" fill="url(#gem)" stroke="#1A0A06" stroke-width="0.9"><animate attributeName="opacity" values="1;0.6;1" dur="0.72s" repeatCount="indefinite" begin="0.45s"/></circle>
+    <circle r="1.25" fill="#FFF7C6" opacity="0.95"/>
+    <circle r="3.2" fill="none" stroke="#FF8A2B" stroke-width="0.9" opacity="0.28"><animate attributeName="r" values="3.2;7;3.2" dur="1.6s" repeatCount="indefinite" begin="0.45s"/><animate attributeName="opacity" values="0.28;0;0.28" dur="1.6s" repeatCount="indefinite" begin="0.45s"/></circle>
+  </g>
+</g>
+<!-- center medallion -->
+<g transform="translate(600,17)">
+  <circle r="14.5" fill="#1E2226" stroke="#3A424A" stroke-width="1.6"/>
+  <circle r="14.5" fill="none" stroke="#FFB62E" stroke-width="0.7" opacity="0.22"/>
+  <circle cx="10.2" cy="-10.2" r="1.3" fill="#5A6570"/><circle cx="-10.2" cy="-10.2" r="1.3" fill="#5A6570"/>
+  <circle cx="10.2" cy="10.2" r="1.3" fill="#5A6570"/><circle cx="-10.2" cy="10.2" r="1.3" fill="#5A6570"/>
+  <circle r="6.8" fill="url(#gem)" stroke="#1A0A06" stroke-width="1"><animate attributeName="opacity" values="1;0.74;1" dur="1.3s" repeatCount="indefinite"/></circle>
+  <circle r="2.2" fill="#FFF7C6" opacity="0.95"/>
+  <circle r="6.8" fill="none" stroke="#FF6B2B" stroke-width="1" opacity="0.32"><animate attributeName="r" values="6.8;12;6.8" dur="1.7s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.32;0;0.32" dur="1.7s" repeatCount="indefinite"/></circle>
+</g>
+<!-- rivets along bar -->
+<g fill="#3A424A" stroke="#0E1012" stroke-width="1">
+  <circle cx="515" cy="17" r="2.4"/><circle cx="515" cy="17" r="0.9" fill="#6B7280"/>
+  <circle cx="685" cy="17" r="2.4"/><circle cx="685" cy="17" r="0.9" fill="#6B7280"/>
+</g>
+</svg>
