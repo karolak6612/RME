@@ -1,0 +1,49 @@
+<svg width="1200" height="28" viewBox="0 0 1200 28" xmlns="http://www.w3.org/2000/svg" role="presentation">
+<defs>
+  <linearGradient id="iron" x1="0" x2="1"><stop offset="0%" stop-color="#2A2E33"/><stop offset="50%" stop-color="#3A424A"/><stop offset="100%" stop-color="#2A2E33"/></linearGradient>
+  <radialGradient id="gem" cx="50%" cy="38%" r="58%"><stop offset="0%" stop-color="#FFF2A8"/><stop offset="35%" stop-color="#FFB62E"/><stop offset="70%" stop-color="#FF6B2B"/><stop offset="100%" stop-color="#7A1F0A"/></radialGradient>
+  <linearGradient id="chainGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3A424A"/><stop offset="100%" stop-color="#1A1E22"/></linearGradient>
+</defs>
+<!-- iron bar -->
+<rect y="12" width="1200" height="4" rx="2" fill="url(#iron)" stroke="#0E1012" stroke-width="1"/>
+<rect y="12" width="1200" height="1.2" fill="#4A535E" opacity="0.6"/>
+<!-- left chain links -->
+<g opacity="0.9">
+  <g transform="translate(180,14)">
+    <ellipse cx="0" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+    <ellipse cx="16" cy="0" rx="10" ry="6" fill="none" stroke="#2F353B" stroke-width="2"/>
+    <ellipse cx="32" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+  </g>
+  <g transform="translate(960,14) scale(-1,1)">
+    <ellipse cx="0" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+    <ellipse cx="16" cy="0" rx="10" ry="6" fill="none" stroke="#2F353B" stroke-width="2"/>
+    <ellipse cx="32" cy="0" rx="10" ry="6" fill="none" stroke="url(#chainGrad)" stroke-width="2"/>
+  </g>
+</g>
+<!-- center medallion -->
+<g transform="translate(600,14)">
+  <!-- outer iron ring -->
+  <circle r="13" fill="#1E2226" stroke="#3A424A" stroke-width="1.6"/>
+  <circle r="13" fill="none" stroke="#FFB62E" stroke-width="0.7" opacity="0.22"/>
+  <!-- rivets on ring -->
+  <circle cx="9.2" cy="-9.2" r="1.3" fill="#5A6570"/><circle cx="-9.2" cy="-9.2" r="1.3" fill="#5A6570"/>
+  <circle cx="9.2" cy="9.2" r="1.3" fill="#5A6570"/><circle cx="-9.2" cy="9.2" r="1.3" fill="#5A6570"/>
+  <!-- gem -->
+  <circle r="6.2" fill="url(#gem)" stroke="#1A0A06" stroke-width="1">
+    <animate attributeName="opacity" values="1;0.78;1" dur="1.4s" repeatCount="indefinite"/>
+  </circle>
+  <circle r="2" fill="#FFF7C6" opacity="0.9"/>
+  <!-- pulse -->
+  <circle r="6.2" fill="none" stroke="#FF6B2B" stroke-width="1" opacity="0.35">
+    <animate attributeName="r" values="6.2;11;6.2" dur="1.8s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.35;0;0.35" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+</g>
+<!-- rivets along bar -->
+<g fill="#3A424A" stroke="#0E1012" stroke-width="1">
+  <circle cx="420" cy="14" r="2.8"/><circle cx="420" cy="14" r="1" fill="#6B7280"/>
+  <circle cx="470" cy="14" r="2.8"/><circle cx="470" cy="14" r="1" fill="#6B7280"/>
+  <circle cx="730" cy="14" r="2.8"/><circle cx="730" cy="14" r="1" fill="#6B7280"/>
+  <circle cx="780" cy="14" r="2.8"/><circle cx="780" cy="14" r="1" fill="#6B7280"/>
+</g>
+</svg>

@@ -1,0 +1,54 @@
+<svg width="520" height="54" viewBox="0 0 520 54" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="BUILD">
+<defs>
+  <linearGradient id="stoneBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1E2226"/><stop offset="100%" stop-color="#0E1114"/></linearGradient>
+  <pattern id="brickS" width="36" height="18" patternUnits="userSpaceOnUse"><rect width="36" height="18" fill="#2A2E33"/><rect y="0" width="36" height="1" fill="#15181B"/><rect y="17" width="36" height="1" fill="#15181B"/><rect x="0" y="1" width="1" height="16" fill="#15181B"/><rect x="17" y="1" width="1" height="8" fill="#1A1E22"/><rect x="35" y="1" width="1" height="16" fill="#15181B"/><rect x="1" y="1" width="16" height="4" fill="#32373D" opacity="0.28"/></pattern>
+  <pattern id="brickS2" width="36" height="18" patternUnits="userSpaceOnUse" patternTransform="translate(18 9)"><rect width="36" height="18" fill="#2F3338"/><rect y="0" width="36" height="1" fill="#15181B"/><rect y="17" width="36" height="1" fill="#15181B"/><rect x="0" y="1" width="1" height="16" fill="#15181B"/><rect x="17" y="1" width="1" height="8" fill="#1A1E22"/><rect x="35" y="1" width="1" height="16" fill="#15181B"/></pattern>
+  <radialGradient id="flame" cx="50%" cy="38%" r="58%"><stop offset="0%" stop-color="#FFF2A8"/><stop offset="28%" stop-color="#FFB62E"/><stop offset="62%" stop-color="#FF6B2B"/><stop offset="100%" stop-color="#7A1F0A" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FF8A2B" stop-opacity="0.55"/><stop offset="100%" stop-color="#FF6B2B" stop-opacity="0"/></radialGradient>
+  <linearGradient id="titleGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F5E6C8"/><stop offset="48%" stop-color="#D8C39A"/><stop offset="100%" stop-color="#9C8A6A"/></linearGradient>
+  <filter id="carve"><feDropShadow dx="0" dy="1.2" stdDeviation="1.1" flood-color="#000" flood-opacity="0.85"/></filter>
+</defs>
+<!-- hanging sign background brick -->
+<rect width="520" height="54" rx="8" fill="url(#stoneBg)"/>
+<rect y="0" width="520" height="24" rx="8" fill="url(#brickS)" opacity="0.9"/>
+<rect y="0" width="520" height="24" rx="8" fill="url(#brickS2)" opacity="0.35"/>
+<!-- iron top bar -->
+<rect y="22" width="520" height="7" rx="1" fill="#1A1E22"/>
+<rect y="22" width="520" height="1.2" fill="#2F353B"/>
+<rect y="27.8" width="520" height="1.2" fill="#0E1012"/>
+<g fill="#3A424A" stroke="#0E1012" stroke-width="0.9">
+  <circle cx="18" cy="25.5" r="2.8"/><circle cx="18" cy="25.5" r="1" fill="#6B7280"/>
+  <circle cx="72" cy="25.5" r="2.8"/><circle cx="72" cy="25.5" r="1" fill="#6B7280"/>
+  <circle cx="260" cy="25.5" r="2.8"/><circle cx="260" cy="25.5" r="1" fill="#6B7280"/>
+  <circle cx="448" cy="25.5" r="2.8"/><circle cx="448" cy="25.5" r="1" fill="#6B7280"/>
+  <circle cx="502" cy="25.5" r="2.8"/><circle cx="502" cy="25.5" r="1" fill="#6B7280"/>
+</g>
+<!-- chains -->
+<g stroke="#3A424A" stroke-width="1.4" opacity="0.9" fill="none">
+  <path d="M 108 6 L 108 22" stroke-dasharray="3 2.5"/>
+  <circle cx="108" cy="8" r="2.6" fill="none" stroke-width="1.1"/><circle cx="108" cy="14.5" r="2.6" fill="none" stroke-width="1.1"/>
+  <path d="M 412 6 L 412 22" stroke-dasharray="3 2.5"/>
+  <circle cx="412" cy="8" r="2.6" fill="none" stroke-width="1.1"/><circle cx="412" cy="14.5" r="2.6" fill="none" stroke-width="1.1"/>
+</g>
+<!-- central plaque -->
+<g transform="translate(260,38)">
+  <rect x="-176" y="-11" width="352" height="26" rx="5" fill="#0E1114" stroke="#2B3036" stroke-width="1.2"/>
+  <rect x="-176" y="-11" width="352" height="26" rx="5" fill="none" stroke="#3A424A" stroke-width="0.9" opacity="0.7"/>
+  <circle cx="-166" cy="2" r="2" fill="#5A6570" stroke="#0E1012" stroke-width="0.8"/>
+  <circle cx="166" cy="2" r="2" fill="#5A6570" stroke="#0E1012" stroke-width="0.8"/>
+</g>
+<!-- torches small left/right on plaque -->
+<g transform="translate(88,38)">
+  <ellipse cx="0" cy="-4" rx="14" ry="14" fill="url(#glow)" opacity="0.55"><animate attributeName="opacity" values="0.55;0.35;0.55" dur="0.5s" repeatCount="indefinite"/></ellipse>
+  <path d="M 0 2 C -3 -4, -5 -8, 0 -15 C 5 -8, 3 -4, 0 2 Z" fill="url(#flame)"><animate attributeName="d" values="M 0 2 C -3 -4, -5 -8, 0 -15 C 5 -8, 3 -4, 0 2 Z;M 0 2 C -2.5 -3.5, -4 -7, 0 -14 C 4 -7, 2.5 -3.5, 0 2 Z;M 0 2 C -3 -4, -5 -8, 0 -15 C 5 -8, 3 -4, 0 2 Z" dur="0.32s" repeatCount="indefinite"/></path>
+  <path d="M 0 2 C -1.6 -1.5, -2.5 -4, 0 -9 C 2.5 -4, 1.6 -1.5, 0 2 Z" fill="#FFF2A8" opacity="0.88"/>
+</g>
+<g transform="translate(432,38)">
+  <ellipse cx="0" cy="-4" rx="14" ry="14" fill="url(#glow)" opacity="0.55"><animate attributeName="opacity" values="0.55;0.38;0.55" dur="0.52s" repeatCount="indefinite"/></ellipse>
+  <path d="M 0 2 C -3 -4, -5 -8, 0 -15 C 5 -8, 3 -4, 0 2 Z" fill="url(#flame)"><animate attributeName="d" values="M 0 2 C -3 -4, -5 -8, 0 -15 C 5 -8, 3 -4, 0 2 Z;M 0 2 C -2.5 -3.5, -4 -7, 0 -14 C 4 -7, 2.5 -3.5, 0 2 Z;M 0 2 C -3 -4, -5 -8, 0 -15 C 5 -8, 3 -4, 0 2 Z" dur="0.34s" repeatCount="indefinite"/></path>
+  <path d="M 0 2 C -1.6 -1.5, -2.5 -4, 0 -9 C 2.5 -4, 1.6 -1.5, 0 2 Z" fill="#FFF2A8" opacity="0.88"/>
+</g>
+<!-- title + sub -->
+<text x="260" y="36.5" text-anchor="middle" font-family="Cinzel, Trajan Pro, serif" font-size="13.5" font-weight="800" letter-spacing="1.2" fill="url(#titleGrad)" filter="url(#carve)">BUILD</text>
+<text x="260" y="46.5" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="7.2" letter-spacing="1.1" fill="#9AA4B2">VCPKG  ·  CONAN  ·  NINJA  ·  CCACHE</text>
+</svg>
