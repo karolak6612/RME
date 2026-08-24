@@ -46,7 +46,7 @@ void BrushSelector::SelectRAWBrush(Selection& selection) {
 
 	if (item && item->getRAWBrush()) {
 		const auto sizeState = g_brush_manager.GetBrushSizeState();
-		g_gui.SelectBrush(item->getRAWBrush(), TILESET_RAW);
+		g_gui.SelectBrush(item->getRAWBrush());
 		g_gui.RestoreBrushSizeState(sizeState);
 	}
 }
@@ -63,7 +63,7 @@ void BrushSelector::SelectGroundBrush(Selection& selection) {
 
 	if (bb) {
 		const auto sizeState = g_brush_manager.GetBrushSizeState();
-		g_gui.SelectBrush(bb, TILESET_TERRAIN);
+		g_gui.SelectBrush(bb);
 		g_gui.RestoreBrushSizeState(sizeState);
 	}
 }
@@ -80,7 +80,7 @@ void BrushSelector::SelectDoodadBrush(Selection& selection) {
 
 	if (item) {
 		const auto sizeState = g_brush_manager.GetBrushSizeState();
-		g_gui.SelectBrush(item->getDoodadBrush(), TILESET_DOODAD);
+		g_gui.SelectBrush(item->getDoodadBrush());
 		g_gui.RestoreBrushSizeState(sizeState);
 	}
 }
@@ -97,7 +97,7 @@ void BrushSelector::SelectDoorBrush(Selection& selection) {
 
 	if (item) {
 		const auto sizeState = g_brush_manager.GetBrushSizeState();
-		g_gui.SelectBrush(item->getDoorBrush(), TILESET_TERRAIN);
+		g_gui.SelectBrush(item->getDoorBrush());
 		g_gui.RestoreBrushSizeState(sizeState);
 	}
 }
@@ -115,7 +115,7 @@ void BrushSelector::SelectWallBrush(Selection& selection) {
 
 	if (wb) {
 		const auto sizeState = g_brush_manager.GetBrushSizeState();
-		g_gui.SelectBrush(wb, TILESET_TERRAIN);
+		g_gui.SelectBrush(wb);
 		g_gui.RestoreBrushSizeState(sizeState);
 	}
 }
@@ -167,7 +167,7 @@ void BrushSelector::SelectHouseBrush(Editor& editor, Selection& selection) {
 		if (house) {
 			g_brush_manager.house_brush->setHouse(house);
 			const auto sizeState = g_brush_manager.GetBrushSizeState();
-			g_gui.SelectBrush(g_brush_manager.house_brush, TILESET_HOUSE);
+			g_gui.SelectBrush(g_brush_manager.house_brush);
 			g_gui.RestoreBrushSizeState(sizeState);
 		}
 	}
@@ -184,7 +184,7 @@ void BrushSelector::SelectCollectionBrush(Selection& selection) {
 		if (item->isWall()) {
 			WallBrush* wb = item->getWallBrush();
 			if (wb && wb->visibleInPalette() && wb->hasCollection()) {
-				g_gui.SelectBrush(wb, TILESET_COLLECTION);
+				g_gui.SelectBrush(wb);
 				g_gui.RestoreBrushSizeState(sizeState);
 				return;
 			}
@@ -192,7 +192,7 @@ void BrushSelector::SelectCollectionBrush(Selection& selection) {
 		if (item->isTable()) {
 			TableBrush* tb = item->getTableBrush();
 			if (tb && tb->visibleInPalette() && tb->hasCollection()) {
-				g_gui.SelectBrush(tb, TILESET_COLLECTION);
+				g_gui.SelectBrush(tb);
 				g_gui.RestoreBrushSizeState(sizeState);
 				return;
 			}
@@ -200,14 +200,14 @@ void BrushSelector::SelectCollectionBrush(Selection& selection) {
 		if (item->isCarpet()) {
 			CarpetBrush* cb = item->getCarpetBrush();
 			if (cb && cb->visibleInPalette() && cb->hasCollection()) {
-				g_gui.SelectBrush(cb, TILESET_COLLECTION);
+				g_gui.SelectBrush(cb);
 				g_gui.RestoreBrushSizeState(sizeState);
 				return;
 			}
 		}
 		if (Brush* db = item->getDoodadBrush()) {
 			if (db && db->visibleInPalette() && db->hasCollection()) {
-				g_gui.SelectBrush(db, TILESET_COLLECTION);
+				g_gui.SelectBrush(db);
 				g_gui.RestoreBrushSizeState(sizeState);
 				return;
 			}
@@ -215,7 +215,7 @@ void BrushSelector::SelectCollectionBrush(Selection& selection) {
 		if (item->isSelected()) {
 			RAWBrush* rb = item->getRAWBrush();
 			if (rb && rb->hasCollection()) {
-				g_gui.SelectBrush(rb, TILESET_COLLECTION);
+				g_gui.SelectBrush(rb);
 				g_gui.RestoreBrushSizeState(sizeState);
 				return;
 			}
@@ -223,7 +223,7 @@ void BrushSelector::SelectCollectionBrush(Selection& selection) {
 	}
 	GroundBrush* gb = tile->getGroundBrush();
 	if (gb && gb->visibleInPalette() && gb->hasCollection()) {
-		g_gui.SelectBrush(gb, TILESET_COLLECTION);
+		g_gui.SelectBrush(gb);
 		g_gui.RestoreBrushSizeState(sizeState);
 		return;
 	}
@@ -237,14 +237,14 @@ void BrushSelector::SelectCreatureBrush(Selection& selection) {
 
 	if (tile->creature) {
 		const auto sizeState = g_brush_manager.GetBrushSizeState();
-		g_gui.SelectBrush(tile->creature->getBrush(), TILESET_CREATURE);
+		g_gui.SelectBrush(tile->creature->getBrush());
 		g_gui.RestoreBrushSizeState(sizeState);
 	}
 }
 
 void BrushSelector::SelectSpawnBrush() {
 	const auto sizeState = g_brush_manager.GetBrushSizeState();
-	g_gui.SelectBrush(g_brush_manager.spawn_brush, TILESET_CREATURE);
+	g_gui.SelectBrush(g_brush_manager.spawn_brush);
 	g_gui.RestoreBrushSizeState(sizeState);
 }
 
@@ -255,7 +255,7 @@ void BrushSelector::SelectSmartBrush(Editor& editor, Tile* tile) {
 			CreatureBrush* brush = tile->creature->getBrush();
 			if (brush) {
 				const auto sizeState = g_brush_manager.GetBrushSizeState();
-				g_gui.SelectBrush(brush, TILESET_CREATURE);
+				g_gui.SelectBrush(brush);
 				g_gui.RestoreBrushSizeState(sizeState);
 				return;
 			}
@@ -264,7 +264,7 @@ void BrushSelector::SelectSmartBrush(Editor& editor, Tile* tile) {
 		Item* item = tile->getTopItem();
 		if (item && item->getRAWBrush()) {
 			const auto sizeState = g_brush_manager.GetBrushSizeState();
-			g_gui.SelectBrush(item->getRAWBrush(), TILESET_RAW);
+			g_gui.SelectBrush(item->getRAWBrush());
 			g_gui.RestoreBrushSizeState(sizeState);
 		}
 	}

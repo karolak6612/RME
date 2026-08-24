@@ -615,7 +615,7 @@ namespace LuaAPI {
 			if (g_items.typeExists(itemId)) {
 				ItemType it = g_items[itemId];
 				if (it.raw_brush) {
-					g_gui.SelectBrush(it.raw_brush, TILESET_RAW);
+					g_gui.SelectBrush(it.raw_brush);
 				}
 			}
 		};
