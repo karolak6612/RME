@@ -1,6 +1,8 @@
+# Remere's Map Editor: Redux
+
 <div align="center">
 
-<img src="docs/readme/header.svg" width="1200" alt="RME Redux — Dungeon Forged — OpenGL 4.6 · C++23 · wxWidgets 3.3">
+<img src="docs/readme/divider.svg" width="1200" alt="divider">
 
 <p>
   <a href="https://github.com/Open-Tibia-Tools/remeres-map-editor-redux/releases"><img src="https://img.shields.io/badge/version-4.1.2-7B61FF?style=flat-square&amp;labelColor=131A2B" alt="version"/></a>
@@ -22,8 +24,10 @@
 
 ---
 
+## What's New
+
 <div align="center">
-  <img src="docs/readme/label-whats-new.svg" width="520" alt="What's New"/>
+  <img src="docs/readme/divider.svg" width="520" alt="divider"/>
 </div>
 
 | Area | Before → After (verified in repo) |
@@ -39,8 +43,10 @@
   <img src="docs/readme/divider.svg" width="1200" alt="divider"/>
 </div>
 
+## Features
+
 <div align="center">
-  <img src="docs/readme/label-features.svg" width="520" alt="Features"/>
+  <img src="docs/readme/divider.svg" width="520" alt="divider"/>
 </div>
 
 <table>
@@ -82,8 +88,10 @@
 
 > Precisely: `protobuf` appearances (`source/protobuf/appearances.proto` via `protobuf_generate_cpp`) and `dat`/`otb`/`xml` parsers (`item_definitions/formats/*`) are already in-tree — `Native assets/Protobuf loading` is **not** future-only.
 
+## Performance
+
 <div align="center">
-  <img src="docs/readme/label-performance.svg" width="520" alt="Performance"/>
+  <img src="docs/readme/divider.svg" width="520" alt="divider"/>
 </div>
 
 - **Batch everything**: sprite instances are collected in `SpriteBatch` and flushed via **MDI** (`glMultiDrawElementsIndirect`) — one dispatch per frame per layer.
@@ -92,8 +100,10 @@
 - **Async**: `SpritePreloader` + `AtlasManager` load off the main thread.
 - **Measure it**: toggle `SHOW_FPS_COUNTER` (`app/settings.cpp:396`) and watch `render_timer.cpp` / `frame_pacer.cpp` / `fps_counter.cpp`. Previous `160+ FPS` claim depends on hardware/map — the engine is *capable*, not guaranteed.
 
+## Clients
+
 <div align="center">
-  <img src="docs/readme/label-clients.svg" width="520" alt="Clients"/>
+  <img src="docs/readme/divider.svg" width="520" alt="divider"/>
 </div>
 
 | Range | Example `dataDirectory` | `otbmVersions` | Notes |
@@ -106,8 +116,10 @@
 
 All 36 packs live in `data/` (`.gitignore` ships them, runtime copies `data` → `<bindir>/data` post-build in `CMakeLists.txt:88`). Same for `source/assets` → `<bindir>/assets`. Missing assets/data → crash at startup — always build through the scripts below.
 
+## Build
+
 <div align="center">
-  <img src="docs/readme/label-build.svg" width="520" alt="Build"/>
+  <img src="docs/readme/divider.svg" width="520" alt="divider"/>
 </div>
 
 **Windows** — needs VS `2022+` (Desktop C++), CMake `3.28+`, `VCPKG_ROOT` at baseline `1940ee77e81573713c0d364c42f5990172198be1`:
@@ -140,8 +152,10 @@ CI: Ubuntu `24.04`, `run-vcpkg@v11` at same baseline, `x64-linux`, Ninja Release
 
 Full deps: `vcpkg.json` (Windows truth) + `conanfile.py` (Linux truth) — keep in sync. Stack: wxWidgets 3.3, glad 4.6, glm, protobuf, liblzma, zlib, boost thread/system, asio, nanovg (`ext/nanovg` fallback), spdlog, tomlplusplus, lua+sol2, cpr, libwebp, nlohmann-json, libarchive, fmt.
 
+## Architecture
+
 <div align="center">
-  <img src="docs/readme/label-architecture.svg" width="520" alt="Architecture"/>
+  <img src="docs/readme/divider.svg" width="520" alt="divider"/>
 </div>
 
 ```
@@ -168,8 +182,10 @@ source/
 - `source/CMakeLists.txt` owns the full file list — edit there, not in `CMakeLists.txt`.
 - Runtime copies `source/assets` + `data` next to the exe post-build.
 
+## Scripting
+
 <div align="center">
-  <img src="docs/readme/label-scripting.svg" width="520" alt="Scripting"/>
+  <img src="docs/readme/divider.svg" width="520" alt="divider"/>
 </div>
 
 - No `CTest` / `ctest`. Verification = **build + run** + in-editor Lua suite.
