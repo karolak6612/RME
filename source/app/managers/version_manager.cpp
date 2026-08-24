@@ -186,7 +186,7 @@ bool VersionManager::LoadCanonicalAssets(const wxString& modular_data_path, cons
 	asset_request.xml_paths.assign(manifest_files.items.begin(), manifest_files.items.end());
 
 	// Track whether this mode uses OTB
-	last_load_has_otb = (asset_request.mode != ItemDefinitionMode::DatOnly);
+	last_load_has_otb = (asset_request.mode != ItemDefinitionMode::DatOnly && asset_request.mode != ItemDefinitionMode::ProtobufOnly);
 
 	AssetBundle bundle;
 	AssetBundleLoader bundle_loader;

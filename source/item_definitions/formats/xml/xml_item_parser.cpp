@@ -1,6 +1,7 @@
 #include "item_definitions/formats/xml/xml_item_parser.h"
 
 #include "ext/pugixml.hpp"
+#include "io/xml_file_loader.h"
 #include "util/common.h"
 
 #include <string_view>
@@ -106,24 +107,9 @@ namespace {
 } // namespace
 
 bool XmlItemParser::parse(const ItemDefinitionLoadInput& input, ItemDefinitionFragments& fragments, wxString& error, std::vector<std::string>& warnings) const {
-	bool parsedAny = false;
-	for (const wxFileName& xmlPath : xmlInputPaths(input)) {
-	pugi::xml_document doc;
-	const pugi::xml_parse_result result = doc.load_file(xmlPath.GetFullPath().mb_str());
-	if (!result) {
-		error = "Could not load items XML file: " + xmlPath.GetFullPath();
-		return false;
-	}
-
-	const pugi::xml_node items_node = doc.child("items");
-	if (!items_node) {
-		error = "Items XML has an invalid root node: " + xmlPath.GetFullPath();
-		return false;
-	}
-
-	for (pugi::xml_node item_node = items_node.first_child(); item_node; item_node = item_node.next_sibling()) {
+	const auto visitor = [&](const FileName&, pugi::xml_node item_node, wxString& visit_error, std::vector<std::string>& visit_warnings) {
 		if (as_lower_str(item_node.name()) != "item") {
-			continue;
+			return true;
 		}
 
 		uint16_t from_id = 0;
@@ -145,7 +131,7 @@ bool XmlItemParser::parse(const ItemDefinitionLoadInput& input, ItemDefinitionFr
 		}
 
 		if (from_id == 0 || to_id == 0) {
-			error = "Could not read XML item id range.";
+			visit_error = "Could not read XML item id range.";
 			return false;
 		}
 
@@ -168,8 +154,19 @@ bool XmlItemParser::parse(const ItemDefinitionLoadInput& input, ItemDefinitionFr
 
 			fragments.xml[fragment.server_id] = std::move(fragment);
 		}
-	}
-	parsedAny = true;
+
+		return true;
+	};
+
+	bool parsedAny = false;
+	for (const wxFileName& xmlPath : xmlInputPaths(input)) {
+		if (!XmlFileLoader::visitElements(FileName(xmlPath.GetFullPath()), "items", visitor, error, warnings)) {
+			if (error.empty()) {
+				error = "Could not load items XML file: " + xmlPath.GetFullPath();
+			}
+			return false;
+		}
+		parsedAny = true;
 	}
 
 	if (parsedAny && fragments.xml.empty()) {
