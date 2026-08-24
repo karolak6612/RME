@@ -20,8 +20,9 @@ namespace NvgUtils {
 	// Creates a composite RGBA buffer from a GameSprite.
 	// Returns a unique_ptr to the buffer, or nullptr on failure.
 	inline std::unique_ptr<uint8_t[]> CreateCompositeRGBA(GameSprite& gs, int& outW, int& outH) {
-		outW = gs.width * 32;
-		outH = gs.height * 32;
+		const auto metrics = gs.getPlainLayoutMetrics(-1, (gs.pattern_x >= 3) ? 2 : 0, 0, 0, 0);
+		outW = metrics.total_width;
+		outH = metrics.total_height;
 
 		if (outW <= 0 || outH <= 0) {
 			return nullptr;
@@ -48,13 +49,19 @@ namespace NvgUtils {
 					if (!spriteData) {
 						continue;
 					}
+					const auto dimensions = gs.spriteList[spriteIdx]->getDimensions();
 
-					// Right-to-left, bottom-to-top arrangement (standard RME rendering order)
-					int part_x = (gs.width - w - 1) * 32;
-					int part_y = (gs.height - h - 1) * 32;
+					int part_x = 0;
+					for (int column = w + 1; column < gs.width; ++column) {
+						part_x += metrics.column_widths[column];
+					}
+					int part_y = 0;
+					for (int row = h + 1; row < gs.height; ++row) {
+						part_y += metrics.row_heights[row];
+					}
 
-					for (int sy = 0; sy < 32; ++sy) {
-						for (int sx = 0; sx < 32; ++sx) {
+					for (int sy = 0; sy < dimensions.height; ++sy) {
+						for (int sx = 0; sx < dimensions.width; ++sx) {
 							int dy = part_y + sy;
 							int dx = part_x + sx;
 
@@ -62,7 +69,7 @@ namespace NvgUtils {
 								continue;
 							}
 
-							int src_idx = (sy * 32 + sx) * 4;
+							int src_idx = (sy * dimensions.width + sx) * 4;
 							int dst_idx = (dy * outW + dx) * 4;
 
 							uint8_t sa = spriteData[src_idx + 3];

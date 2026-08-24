@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <array>
+#include <exception>
+#include <fstream>
 #include <format>
 #include <optional>
 #include <span>
@@ -13,7 +15,9 @@
 #include "app/definitions.h"
 #include "io/filehandle.h"
 #include "item_definitions/core/item_definition_fragments.h"
+#include "item_definitions/core/item_definition_types.h"
 #include "item_definitions/formats/dat/dat_item_parser.h"
+#include "util/json.h"
 
 namespace {
 	constexpr size_t kMaxSampleOffsets = 24;
@@ -40,22 +44,35 @@ namespace {
 	};
 
 	ResolvedClientFile resolveClientFile(const wxFileName& client_path, const std::string& configured_name, const std::string& fallback_name) {
-		const auto sanitizeFileName = [](const std::string& raw_name) {
-			return wxFileName(wxString::FromUTF8(raw_name)).GetFullName().ToStdString();
+		const auto isSafeRelativePath = [](const std::string& raw_name) {
+			if (raw_name.empty()) {
+				return false;
+			}
+			const wxFileName path(wxString::FromUTF8(raw_name));
+			if (path.IsAbsolute()) {
+				return false;
+			}
+			for (const auto& directory : path.GetDirs()) {
+				if (directory == "..") {
+					return false;
+				}
+			}
+			return true;
 		};
 
-		ResolvedClientFile resolved;
-		resolved.filename = sanitizeFileName(configured_name);
-		resolved.path = wxFileName(client_path.GetFullPath(), wxString::FromUTF8(resolved.filename));
-		if (resolved.path.FileExists()) {
-			resolved.exists = true;
-			return resolved;
+		for (const auto& candidate_name : { configured_name, fallback_name }) {
+			if (!isSafeRelativePath(candidate_name)) {
+				continue;
+			}
+			ResolvedClientFile resolved;
+			resolved.filename = candidate_name;
+			resolved.path = wxFileName(client_path.GetFullPath(), wxString::FromUTF8(candidate_name));
+			resolved.exists = resolved.path.FileExists();
+			if (resolved.exists) {
+				return resolved;
+			}
 		}
-
-		resolved.filename = sanitizeFileName(fallback_name);
-		resolved.path = wxFileName(client_path.GetFullPath(), wxString::FromUTF8(resolved.filename));
-		resolved.exists = resolved.path.FileExists();
-		return resolved;
+		return {};
 	}
 
 	std::optional<uint32_t> readSignature(const wxFileName& path, std::string_view label, std::vector<std::string>& warnings) {
@@ -306,16 +323,28 @@ namespace {
 }
 
 ClientAssetDetectionResult ClientAssetDetector::detect(const ClientVersion& client) {
+	// common code: check if path exists
 	ClientAssetDetectionResult result;
-
-	const auto client_path = client.getClientPath();
-	if (!client_path.DirExists()) {
+	if (!client.getClientPath().DirExists()) {
 		const auto message = "Client asset detection skipped: selected client path does not exist.";
 		spdlog::warn(message);
 		result.warnings.emplace_back(message);
 		return result;
 	}
 
+	// protobuf
+	if (client.isProtobuf()) {
+		internalDetectProtobuf(client, result);
+        return result;
+	}
+
+	// spr/dat
+	internalDetectSprDat(client, result);
+    return result;
+}
+
+void ClientAssetDetector::internalDetectSprDat(const ClientVersion& client, ClientAssetDetectionResult& result) {
+	const auto client_path = client.getClientPath();
 	const auto dat_file = resolveClientFile(client_path, client.getMetadataFile(), std::string { ASSETS_NAME } + ".dat");
 	const auto spr_file = resolveClientFile(client_path, client.getSpritesFile(), std::string { ASSETS_NAME } + ".spr");
 
@@ -386,6 +415,90 @@ ClientAssetDetectionResult ClientAssetDetector::detect(const ClientVersion& clie
 			}
 		}
 	}
+}
 
-	return result;
+void ClientAssetDetector::internalDetectProtobuf(const ClientVersion& client, ClientAssetDetectionResult& result) {
+	// in protobuf mode, these features are always supported
+	result.transparency = true;
+	result.extended = true;
+	result.frame_durations = true;
+	result.frame_groups = true;
+
+	// search for catalog-content.json first
+	const auto client_path = client.getClientPath();
+	const auto catalog_file = resolveClientFile(client_path, "catalog-content.json", "assets/catalog-content.json");
+
+	// determine the catalog file
+	// catalog-content contains protobuf-encoded dat filename and indexing for spritesheets
+	if (!catalog_file.exists) {
+		const auto message = "Client asset detection failed: catalog-content.json was not found in the selected client path.";
+		spdlog::warn(message);
+		result.warnings.emplace_back(message);
+		return;
+	}
+
+	// open catalog-content.json
+	std::ifstream catalog_stream(catalog_file.path.GetFullPath().ToStdString());
+	if (!catalog_stream.is_open()) {
+		const auto message = std::format("Client asset detection failed: could not open {}", catalog_file.path.GetFullPath().ToStdString());
+		spdlog::warn(message);
+		result.warnings.emplace_back(message);
+		return;
+	}
+
+	// unserialize catalog-content.json
+	ResolvedClientFile appearances_file;
+	try {
+		json::json root;
+		catalog_stream >> root;
+
+		const auto scanCatalogEntry = [&](const json::json& entry) {
+			if (!entry.is_object()) {
+				return;
+			}
+
+			if (!entry.contains("type") || !entry["type"].is_string()) {
+				return;
+			}
+
+			const auto entry_type = entry["type"].get<std::string>();
+			if (entry_type != "appearances") {
+				return;
+			}
+
+			if (entry.contains("file") && entry["file"].is_string()) {
+                auto appearancesFileName = entry["file"].get<std::string>();
+				appearances_file = resolveClientFile(client_path, appearancesFileName, "assets/" + appearancesFileName);
+			}
+		};
+
+		if (root.is_array()) {
+			for (const auto& entry : root) {
+				scanCatalogEntry(entry);
+			}
+		} else {
+			scanCatalogEntry(root);
+		}
+	} catch (const std::exception& e) {
+		const auto message = std::format("Client asset detection failed: could not read catalog-content.json: {}", e.what());
+		spdlog::warn(message);
+		result.warnings.emplace_back(message);
+		return;
+	}
+
+	// check if appearances exists
+	if (!appearances_file.exists) {
+		const auto message = "Client asset detection failed: appearances DAT file from catalog-content was not found.";
+		spdlog::warn(message);
+		result.warnings.emplace_back(message);
+        return;
+	}
+
+	// apply file names
+	result.metadata_file_name = appearances_file.filename;
+	result.sprites_file_name = catalog_file.filename;
+
+	// file signatures are not applicable to protobuf
+	result.dat_signature = 0;
+    result.spr_signature = 0;
 }

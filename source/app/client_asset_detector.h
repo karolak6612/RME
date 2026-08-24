@@ -25,6 +25,10 @@ struct ClientAssetDetectionResult {
 class ClientAssetDetector {
 public:
 	[[nodiscard]] static ClientAssetDetectionResult detect(const ClientVersion& client);
+
+private:
+    static void internalDetectSprDat(const ClientVersion& client, ClientAssetDetectionResult& result);
+    static void internalDetectProtobuf(const ClientVersion& client, ClientAssetDetectionResult& result);
 };
 
 #endif

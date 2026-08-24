@@ -104,6 +104,7 @@ set(rme_H
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/dat/dat_item_parser.h
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/otb/otb_item_format.h
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/otb/otb_item_parser.h
+	${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/protobuf/protobuf_item_parser.h
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/xml/xml_item_parser.h
 
     ${CMAKE_CURRENT_LIST_DIR}/ingame_preview/floor_visibility_calculator.h
@@ -119,6 +120,7 @@ set(rme_H
     ${CMAKE_CURRENT_LIST_DIR}/io/iomap.h
     ${CMAKE_CURRENT_LIST_DIR}/io/iomap_otbm.h
     ${CMAKE_CURRENT_LIST_DIR}/io/map_xml_io.h
+    ${CMAKE_CURRENT_LIST_DIR}/io/xml_file_loader.h
     ${CMAKE_CURRENT_LIST_DIR}/io/otbm/item_serialization_otbm.h
     ${CMAKE_CURRENT_LIST_DIR}/io/otbm/header_serialization_otbm.h
     ${CMAKE_CURRENT_LIST_DIR}/io/otbm/waypoint_serialization_otbm.h
@@ -490,6 +492,7 @@ set(rme_SRC
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/core/item_definitions_loader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/dat/dat_item_parser.cpp
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/otb/otb_item_parser.cpp
+	${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/protobuf/protobuf_item_parser.cpp
     ${CMAKE_CURRENT_LIST_DIR}/item_definitions/formats/xml/xml_item_parser.cpp
 
     ${CMAKE_CURRENT_LIST_DIR}/ingame_preview/floor_visibility_calculator.cpp
@@ -505,6 +508,7 @@ set(rme_SRC
     ${CMAKE_CURRENT_LIST_DIR}/io/iomap.cpp
     ${CMAKE_CURRENT_LIST_DIR}/io/iomap_otbm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/io/map_xml_io.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/io/xml_file_loader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/io/otbm/item_serialization_otbm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/io/otbm/header_serialization_otbm.cpp
     ${CMAKE_CURRENT_LIST_DIR}/io/otbm/waypoint_serialization_otbm.cpp

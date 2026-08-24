@@ -37,10 +37,15 @@
 ---@field isGroundTile boolean
 ---@field isBorder boolean
 ---@field isWall boolean
+---@field isPodium boolean
 ---@field isDoor boolean
 ---@field hasElevation boolean
 ---@field zOrder number
 local ItemClass = {}
+
+---@param lookType number
+---@param direction? number
+function ItemClass:setPodiumOutfit(lookType, direction) end
 
 ---@class Creature
 ---@field name string
@@ -160,6 +165,7 @@ function MapClass:getTile(x, y, z) return nil end
 ---@field addContextMenu fun(label: string, callback: fun())
 ---@field selectRaw fun(id: number)
 ---@field setCameraPosition fun(x: number, y: number, z: number)
+---@field getCreatureSpriteMaxId fun(): number
 ---@field storage fun(name: string): ScriptStorage
 ---@field yield fun() Yields to process pending UI events (prevents freeze during long operations)
 ---@field sleep fun(milliseconds: number) Sleeps for the given milliseconds (max 10000). Blocks UI.

@@ -19,6 +19,7 @@
 #include "lua_api_item.h"
 #include "game/item.h"
 #include "game/items.h"
+#include "game/complexitem.h"
 
 #include <algorithm>
 #include <cctype>
@@ -113,6 +114,25 @@ namespace LuaAPI {
 			"isFluidContainer", sol::property(&Item::isFluidContainer),
 			"isSplash", sol::property(&Item::isSplash),
 			"hasCharges", sol::property(&Item::hasCharges),
+			"isPodium", sol::property([](const Item& item) { return item.asPodium() != nullptr; }),
+			"setPodiumOutfit", [](Item& item, int lookType, sol::optional<int> direction) {
+				Podium* podium = item.asPodium();
+				if (!podium) {
+					throw sol::error("setPodiumOutfit: item is not a podium");
+				}
+				if (lookType < 0) {
+					throw sol::error("setPodiumOutfit: lookType must not be negative");
+				}
+				if (direction && (*direction < 0 || *direction > 255)) {
+					throw sol::error("setPodiumOutfit: direction must be between 0 and 255");
+				}
+				Outfit outfit = podium->getOutfit();
+				outfit.lookType = lookType;
+				podium->setOutfit(outfit);
+				if (direction) {
+					podium->setDirection(static_cast<uint8_t>(*direction));
+				}
+			},
 			"hasElevation", sol::property([](const Item& item) {
 				if (g_items.typeExists(item.getID())) {
 					return g_items[item.getID()].hasElevation;
@@ -155,6 +175,8 @@ namespace LuaAPI {
 			info["isDoor"] = it.isDoor();
 			info["isTable"] = it.isTable;
 			info["isCarpet"] = it.isCarpet;
+			const auto definition = g_item_definitions.get(id);
+			info["isPodium"] = definition && definition.isPodium();
 			info["hasElevation"] = it.hasElevation;
 			return info;
 		};

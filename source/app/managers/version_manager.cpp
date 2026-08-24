@@ -111,7 +111,7 @@ bool VersionManager::LoadDataFiles(wxString& error, std::vector<std::string>& wa
 	asset_request.xml_path = wxFileName(base_data_path + "items.xml");
 
 	// Track whether this mode uses OTB
-	last_load_has_otb = (asset_request.mode != ItemDefinitionMode::DatOnly);
+	last_load_has_otb = (asset_request.mode != ItemDefinitionMode::DatOnly && asset_request.mode != ItemDefinitionMode::ProtobufOnly);
 
 	AssetBundle bundle;
 	AssetBundleLoader bundle_loader;

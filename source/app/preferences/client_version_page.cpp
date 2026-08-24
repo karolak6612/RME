@@ -55,7 +55,9 @@ std::string ConfigTypeFromSelection(long selection) {
 		case 2:
 			return "dat_srv";
 		case 3:
-			return "protobuf";
+			return "protobuf_otb";
+		case 4:
+			return "protobuf_only";
 		default:
 			return "dat_otb";
 	}
@@ -68,8 +70,11 @@ int SelectionFromConfigType(const std::string& value) {
 	if (value == "dat_srv") {
 		return 2;
 	}
-	if (value == "protobuf") {
+	if (value == "protobuf" || value == "protobuf_otb") {
 		return 3;
+	}
+	if (value == "protobuf_only") {
+        return 4;
 	}
 	return 0;
 }
@@ -314,6 +319,9 @@ int ClientVersionPage::GetMajorGroup(const ClientVersion& version) const {
 }
 
 void ClientVersionPage::PopulateClientTree() {
+	const bool previous_ignore_tree_selection = ignore_tree_selection;
+	ignore_tree_selection = true;
+
 	ClientVersion* preferred_selection = active_client;
 	client_tree_ctrl->DeleteAllItems();
 	auto root = client_tree_ctrl->AddRoot("Clients");
@@ -363,7 +371,6 @@ void ClientVersionPage::PopulateClientTree() {
 		client_tree_ctrl->Expand(group_to_expand);
 	}
 
-	ignore_tree_selection = true;
 	if (item_to_select.IsOk()) {
 		client_tree_ctrl->SelectItem(item_to_select);
 		client_tree_ctrl->EnsureVisible(item_to_select);
@@ -373,7 +380,7 @@ void ClientVersionPage::PopulateClientTree() {
 	} else {
 		client_tree_ctrl->UnselectAll();
 	}
-	ignore_tree_selection = false;
+	ignore_tree_selection = previous_ignore_tree_selection;
 }
 
 void ClientVersionPage::SelectClient(ClientVersion* version) {
@@ -456,7 +463,8 @@ void ClientVersionPage::RefreshClientEditor() {
 	config_choices.Add("dat_otb");
 	config_choices.Add("dat_only");
 	config_choices.Add("dat_srv");
-	config_choices.Add("protobuf");
+	config_choices.Add("protobuf_otb");
+	config_choices.Add("protobuf_only");
 	auto* config_property = client_prop_grid->Append(new wxEnumProperty("Configuration Type", "configType", config_choices, SelectionFromConfigType(active_client->getConfigType())));
 	config_property->SetHelpString("How item definitions are loaded for this client.");
 
@@ -779,8 +787,13 @@ void ClientVersionPage::UpdatePropertyValidation(wxPGProperty* prop) {
 	}
 }
 
-void ClientVersionPage::OnClientSelected(wxTreeEvent& WXUNUSED(event)) {
+void ClientVersionPage::OnClientSelected(wxTreeEvent& event) {
 	if (ignore_tree_selection) {
+		return;
+	}
+
+	// Ignore selection events queued for items removed during a tree rebuild.
+	if (!event.GetItem().IsOk() || event.GetItem() != client_tree_ctrl->GetSelection()) {
 		return;
 	}
 
@@ -799,7 +812,7 @@ void ClientVersionPage::OnClientSelected(wxTreeEvent& WXUNUSED(event)) {
 		return;
 	}
 
-	if (had_dirty_changes) {
+	if (had_dirty_changes && !previous_client->isDirty()) {
 		PopulateDefaultVersionChoice();
 		PopulateClientTree();
 		ignore_tree_selection = true;

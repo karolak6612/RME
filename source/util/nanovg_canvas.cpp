@@ -1,5 +1,7 @@
 #include "app/main.h"
 #include "util/nanovg_canvas.h"
+
+#include "app/definitions.h"
 #include "util/image_manager.h"
 #include "rendering/core/text_renderer.h"
 #include "ui/theme.h"
@@ -234,8 +236,10 @@ int NanoVGCanvas::GetOrCreateSpriteTexture(NVGcontext* vg, Sprite* sprite) {
 
 int NanoVGCanvas::CreateGameSpriteTexture(NVGcontext* vg, GameSprite* gs, uint64_t spriteId) {
 	// Calculate composite size
-	int w = gs->width * 32;
-	int h = gs->height * 32;
+	const int pattern_x = (gs->pattern_x >= 3) ? 2 : 0;
+	const auto metrics = gs->getPlainLayoutMetrics(-1, pattern_x, 0, 0, 0);
+	int w = metrics.total_width;
+	int h = metrics.total_height;
 	if (w <= 0 || h <= 0) {
 		return 0;
 	}
@@ -245,11 +249,10 @@ int NanoVGCanvas::CreateGameSpriteTexture(NVGcontext* vg, GameSprite* gs, uint64
 	std::vector<uint8_t> composite(bufferSize, 0);
 
 	// Composite all layers
-	int px = (gs->pattern_x >= 3) ? 2 : 0;
 	for (int l = 0; l < gs->layers; ++l) {
 		for (int sw = 0; sw < gs->width; ++sw) {
 			for (int sh = 0; sh < gs->height; ++sh) {
-				int idx = gs->getIndex(sw, sh, l, px, 0, 0, 0);
+				int idx = gs->getIndex(sw, sh, l, pattern_x, 0, 0, 0);
 				if (idx < 0 || static_cast<size_t>(idx) >= gs->spriteList.size()) {
 					continue;
 				}
@@ -263,16 +266,26 @@ int NanoVGCanvas::CreateGameSpriteTexture(NVGcontext* vg, GameSprite* gs, uint64
 				if (!data) {
 					continue;
 				}
+				const auto dimensions = image->getDimensions();
 
-				int part_x = (gs->width - sw - 1) * 32;
-				int part_y = (gs->height - sh - 1) * 32;
+				int part_x = 0;
+				for (int column = sw + 1; column < gs->width; ++column) {
+					part_x += metrics.column_widths[column];
+				}
+				int part_y = 0;
+				for (int row = sh + 1; row < gs->height; ++row) {
+					part_y += metrics.row_heights[row];
+				}
 
-				for (int sy = 0; sy < 32; ++sy) {
-					for (int sx = 0; sx < 32; ++sx) {
+				for (int sy = 0; sy < dimensions.height; ++sy) {
+					for (int sx = 0; sx < dimensions.width; ++sx) {
 						int dy = part_y + sy;
 						int dx = part_x + sx;
+						if (dx < 0 || dx >= w || dy < 0 || dy >= h) {
+							continue;
+						}
 						int di = (dy * w + dx) * 4;
-						int si = (sy * 32 + sx) * 4;
+						int si = (sy * dimensions.width + sx) * 4;
 
 						uint8_t sa = data[si + 3];
 						if (sa == 0) {

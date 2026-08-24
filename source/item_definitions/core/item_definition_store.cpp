@@ -17,7 +17,12 @@ ItemDefinitionView::ItemDefinitionView(const ItemDefinitionStore* store, Definit
 
 bool ItemDefinitionView::isValid() const {
 	return store_ != nullptr && index_ < store_->identity_.server_ids.size() && index_ < store_->visual_.client_ids.size() &&
-		index_ < store_->editor_.data.size();
+		index_ < store_->editor_.data.size() && index_ < store_->passive_metadata_.json_blobs.size();
+}
+
+std::string_view ItemDefinitionView::passiveMetadataJson() const {
+	static constexpr std::string_view empty;
+	return isValid() ? std::string_view(store_->passive_metadata_.json_blobs[index_]) : empty;
 }
 
 ServerItemId ItemDefinitionView::serverId() const {
@@ -89,6 +94,7 @@ void ItemDefinitionStore::clear() {
 	attributes_ = {};
 	text_ = {};
 	visual_ = {};
+	passive_metadata_ = {};
 	editor_ = {};
 	server_to_index_.fill(0);
 	client_to_servers_.clear();
@@ -123,6 +129,7 @@ void ItemDefinitionStore::reserve(size_t count) {
 	text_.names.reserve(count);
 	text_.editor_suffixes.reserve(count);
 	text_.descriptions.reserve(count);
+	passive_metadata_.json_blobs.reserve(count);
 	visual_.client_ids.reserve(count);
 	editor_.data.reserve(count);
 }
@@ -152,6 +159,7 @@ void ItemDefinitionStore::append(ResolvedItemDefinitionRow row) {
 	text_.names.push_back(std::move(row.name));
 	text_.editor_suffixes.push_back(std::move(row.editor_suffix));
 	text_.descriptions.push_back(std::move(row.description));
+	passive_metadata_.json_blobs.push_back(std::move(row.passive_metadata_json));
 	visual_.client_ids.push_back(row.client_id);
 	editor_.data.emplace_back();
 

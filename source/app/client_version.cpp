@@ -488,6 +488,11 @@ bool ClientVersion::hasValidPaths() {
 	sprites_path = wxFileName(client_path.GetFullPath(), wxString(sprites_file));
 
 	if (!metadata_path.FileExists() || !sprites_path.FileExists()) {
+		// protobuf should stick to catalog-content.json and prodvided dat file
+		if (isProtobuf()) {
+            return false;
+		}
+
 		// Fallback to "Tibia.dat" / "Tibia.spr" if the configured files don't exist
 		// This maintains some backward compatibility if the toml config is slightly off but files are standard
 		metadata_path = wxFileName(client_path.GetFullPath(), wxString(ASSETS_NAME) + ".dat");
@@ -498,7 +503,8 @@ bool ClientVersion::hasValidPaths() {
 		return false;
 	}
 
-	if (!g_settings.getInteger(Config::CHECK_SIGNATURES)) {
+	// protobuf does not use signatures
+	if (isProtobuf() || !g_settings.getInteger(Config::CHECK_SIGNATURES)) {
 		return true;
 	}
 

@@ -19,11 +19,17 @@ const ItemDefinitionRecipe& ItemDefinitionRecipeRegistry::get(ItemDefinitionMode
 		.source_count = 3,
 		.runnable = false,
 	};
-	static const ItemDefinitionRecipe protobuf {
-		.mode = ItemDefinitionMode::Protobuf,
+	static const ItemDefinitionRecipe protobuf_otb {
+		.mode = ItemDefinitionMode::ProtobufOtb,
+		.sources = { ItemDefinitionSourceKind::Protobuf, ItemDefinitionSourceKind::Otb, ItemDefinitionSourceKind::Xml },
+		.source_count = 3,
+		.runnable = true,
+	};
+	static const ItemDefinitionRecipe protobuf_only {
+		.mode = ItemDefinitionMode::ProtobufOnly,
 		.sources = { ItemDefinitionSourceKind::Protobuf, ItemDefinitionSourceKind::Xml, ItemDefinitionSourceKind::Xml },
 		.source_count = 2,
-		.runnable = false,
+		.runnable = true,
 	};
 
 	switch (mode) {
@@ -33,8 +39,10 @@ const ItemDefinitionRecipe& ItemDefinitionRecipeRegistry::get(ItemDefinitionMode
 			return dat_only;
 		case ItemDefinitionMode::DatSrv:
 			return dat_srv;
-		case ItemDefinitionMode::Protobuf:
-			return protobuf;
+		case ItemDefinitionMode::ProtobufOtb:
+			return protobuf_otb;
+		case ItemDefinitionMode::ProtobufOnly:
+			return protobuf_only;
 		default:
 			return dat_otb;
 	}
